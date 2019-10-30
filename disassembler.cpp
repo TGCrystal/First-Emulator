@@ -7,14 +7,14 @@
 int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 	unsigned char code = codebuffer[pc];
 	int opBytes = 1;
-	std::cout << std::hex << pc << " ";
+	std::cout << std::hex << std::setw(4) << std::setfill('0') << pc << " ";
 	switch(code)
 	{
 		case 0x00: 
 			std::cout << "NOP";
 			break;
 		case 0x01:
-			std::cout << "LXI    B," << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "LXI    B,#$" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0x02: 
@@ -30,7 +30,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DCR    B";
 			break;
 		case 0x06: 
-			std::cout << "MVI    B," << std::hex << +codebuffer[pc+1];
+			std::cout << "MVI    B,#$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0x07:
@@ -55,7 +55,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DCR    C";
 			break;
 		case 0x0e: 
-			std::cout << "MVI    C," << std::hex << +codebuffer[pc+1];
+			std::cout << "MVI    C,#$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0x0f:
@@ -65,7 +65,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "NOP";
 			break;
 		case 0x11:
-			std::cout << "LXI    D," << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "LXI    D,#$" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0x12: 
@@ -81,7 +81,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DCR    D";
 			break;
 		case 0x16: 
-			std::cout << "MVI    D," << std::hex << +codebuffer[pc+1];
+			std::cout << "MVI    D,#$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0x17:
@@ -106,7 +106,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DCR    E";
 			break;
 		case 0x1e: 
-			std::cout << "MVI    E," << std::hex << +codebuffer[pc+1];
+			std::cout << "MVI    E,#$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0x1f:
@@ -116,11 +116,11 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "RIM";
 			break;
 		case 0x21:
-			std::cout << "LXI    H," << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "LXI    H,#$" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0x22:
-			std::cout << "SHLD   " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "SHLD   $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0x23: 
@@ -133,7 +133,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DCR    H";
 			break;
 		case 0x26: 
-			std::cout << "MVI    H," << std::hex << +codebuffer[pc+1];
+			std::cout << "MVI    H,#$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0x27:
@@ -146,7 +146,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DAD    H";
 			break;
 		case 0x2a: 
-			std::cout << "LHLD   " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "LHLD   $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0x2b: 
@@ -159,7 +159,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DCR    L";
 			break;
 		case 0x2e: 
-			std::cout << "MVI    L," << std::hex << +codebuffer[pc+1];
+			std::cout << "MVI    L,#$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0x2f:
@@ -169,11 +169,11 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "NOP";
 			break;
 		case 0x31:
-			std::cout << "LXI    SP," << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "LXI    SP,#$" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0x32:
-			std::cout << "STA    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "STA    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0x33: 
@@ -186,7 +186,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DCR    M";
 			break;
 		case 0x36: 
-			std::cout << "MVI    M," << std::hex << +codebuffer[pc+1];
+			std::cout << "MVI    M,#$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0x37:
@@ -199,7 +199,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DAD    SP";
 			break;
 		case 0x3a: 
-			std::cout << "LDA    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "LDA    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0x3b: 
@@ -212,7 +212,7 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "DCR    A";
 			break;
 		case 0x3e: 
-			std::cout << "MVI    A," << std::hex << +codebuffer[pc+1];
+			std::cout << "MVI    A,#$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0x3f:
@@ -609,22 +609,22 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "POP    B";
 			break;
 		case 0xc2:
-			std::cout << "JNZ    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "JNZ    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xc3:
-			std::cout << "JMP    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "JMP    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xc4:
-			std::cout << "CNZ    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "CNZ    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xc5:
 			std::cout << "PUSH   B";
 			break;
 		case 0xc6:
-			std::cout << "ADI    " << std::hex << +codebuffer[pc+1];
+			std::cout << "ADI    #$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0xc7:
@@ -637,18 +637,18 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "RET";
 			break;
 		case 0xca:
-			std::cout << "JZ     " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "JZ     $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xcb:
 			std::cout << "NOP";
 			break;
 		case 0xcc:
-			std::cout << "CZ     " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "CZ     $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xcd:
-			std::cout << "CALL   " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "CALL   $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xce:
@@ -665,22 +665,22 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "POP    D";
 			break;
 		case 0xd2:
-			std::cout << "JNC    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "JNC    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xd3:
-			std::cout << "OUT    " << std::hex << +codebuffer[pc+1];
+			std::cout << "OUT    #$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0xd4:
-			std::cout << "CNC    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "CNC    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xd5:
 			std::cout << "PUSH   D";
 			break;
 		case 0xd6:
-			std::cout << "SUI    " << std::hex << +codebuffer[pc+1];
+			std::cout << "SUI    #$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0xd7:
@@ -693,22 +693,22 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "NOP";
 			break;
 		case 0xda:
-			std::cout << "JC     " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "JC     $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xdb:
-			std::cout << "IN     " << std::hex << +codebuffer[pc+1];
+			std::cout << "IN     #$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0xdc:
-			std::cout << "CC     " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "CC     $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xdd:
 			std::cout << "NOP";
 			break;
 		case 0xde:
-			std::cout << "SBI    " << std::hex << +codebuffer[pc+1];
+			std::cout << "SBI    #$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0xdf:
@@ -721,21 +721,21 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "POP    H";
 			break;
 		case 0xe2:
-			std::cout << "JPO    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "JPO    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xe3:
 			std::cout << "XTHL";
 			break;
 		case 0xe4:
-			std::cout << "CPO    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "CPO    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xe5:
 			std::cout << "PUSH   H";
 			break;
 		case 0xe6:
-			std::cout << "ANI    " << std::hex << +codebuffer[pc+1];
+			std::cout << "ANI    #$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0xe7:
@@ -748,21 +748,21 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "PCHL";
 			break;
 		case 0xea:
-			std::cout << "JPE    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "JPE    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xeb:
 			std::cout << "XCHG";
 			break;
 		case 0xec:
-			std::cout << "CPE    " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "CPE    $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xed:
 			std::cout << "NOP";
 			break;
 		case 0xee:
-			std::cout << "XRI    " << std::hex << +codebuffer[pc+1];
+			std::cout << "XRI    #$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0xef:
@@ -775,21 +775,21 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "POP    PSW";
 			break;
 		case 0xf2:
-			std::cout << "JP     " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "JP     $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xf3:
 			std::cout << "DI";
 			break;
 		case 0xf4:
-			std::cout << "CP     " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "CP     $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xf5:
 			std::cout << "PUSH   PSW";
 			break;
 		case 0xf6:
-			std::cout << "ORI    " << std::hex << +codebuffer[pc+1];
+			std::cout << "ORI    #$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0xf7:
@@ -802,21 +802,21 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "SPHL";
 			break;
 		case 0xfa:
-			std::cout << "JM     " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "JM     $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xfb:
 			std::cout << "EI";
 			break;
 		case 0xfc:
-			std::cout << "CM     " << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
+			std::cout << "CM     $" << std::hex << +codebuffer[pc+2] << +codebuffer[pc+1];
 			opBytes = 3;
 			break;
 		case 0xfd:
 			std::cout << "NOP";
 			break;
 		case 0xfe:
-			std::cout << "CPI    " << std::hex << +codebuffer[pc+1];
+			std::cout << "CPI    #$" << std::hex << +codebuffer[pc+1];
 			opBytes = 2;
 			break;
 		case 0xff:

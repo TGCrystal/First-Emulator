@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
 	// unsigned char A, B, C, D, E, H, L;
 	// unsigned char* pc;
 
-	disassembleROM("DisassemblerTest.txt");
+	disassembleROM("invaders.h");
 
 	return 0;
 

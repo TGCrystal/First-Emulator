@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <bitset>
 
 #include "disassembler.h"
 
@@ -28,17 +29,26 @@ void UnimplementedInstruction(State8080& state) {
 }
 
 int Parity(int num) {
-	answer = 0;
+	uint8_t answer = 0;
 	while(num != 0) {
 		answer += (num & 1);
-		num >> 1;
+		num = num >> 1;
 	}
-	return answer;
+	return !(answer & 1);
+}
+
+void add(State8080& state, uint8_t num, uint16_t carry) {
+	uint16_t answer = (uint16_t) state.a + (uint16_t) num + carry;
+	state.cc.z = ((answer & 0xff) == 0);
+	state.cc.s = ((answer & 0x80) != 0);
+	state.cc.cy = (answer > 0xff);
+	state.cc.p = Parity(answer & 0xff);
+	state.cc.ac = ((state.a & 0x0f) + (num & 0x0f) + carry) > 0x0f;
+	state.a = answer & 0xff;
 }
 
 void Emulate8080Op(State8080& state) {
 	unsigned char* opcode = &state.memory[state.pc];
-
 	switch(*opcode) {
 		case 0x00: //NOP
 			break;
@@ -61,7 +71,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x06: 
 			// std::cout << "MVI    B,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0x07:
 			// std::cout << "RLC";
@@ -86,7 +95,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x0e: 
 			// std::cout << "MVI    C,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0x0f:
 			// std::cout << "RRC";
@@ -96,7 +104,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x11:
 			// std::cout << "LXI    D,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0x12: 
 			// std::cout << "STAX   D";
@@ -112,7 +119,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x16: 
 			// std::cout << "MVI    D,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0x17:
 			// std::cout << "RAL";
@@ -137,7 +143,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x1e: 
 			// std::cout << "MVI    E,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0x1f:
 			// std::cout << "RAR";
@@ -147,11 +152,9 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x21:
 			// std::cout << "LXI    H,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0x22:
 			// std::cout << "SHLD   $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0x23: 
 			// std::cout << "INX    H";
@@ -164,7 +167,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x26: 
 			// std::cout << "MVI    H,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0x27:
 			// std::cout << "DAA";
@@ -177,7 +179,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x2a: 
 			// std::cout << "LHLD   $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0x2b: 
 			// std::cout << "DCX    H";
@@ -190,7 +191,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x2e: 
 			// std::cout << "MVI    L,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0x2f:
 			// std::cout << "CMA";
@@ -200,11 +200,9 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x31:
 			// std::cout << "LXI    SP,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0x32:
 			// std::cout << "STA    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0x33: 
 			// std::cout << "INX    SP";
@@ -217,7 +215,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x36: 
 			// std::cout << "MVI    M,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0x37:
 			// std::cout << "STC";
@@ -230,7 +227,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x3a: 
 			// std::cout << "LDA    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0x3b: 
 			// std::cout << "DCX    SP";
@@ -243,7 +239,6 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x3e: 
 			// std::cout << "MVI    A,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0x3f:
 			// std::cout << "CMC";
@@ -441,182 +436,100 @@ void Emulate8080Op(State8080& state) {
 			// std::cout << "MOV    A,A";
 			break;
 		case 0x80: //ADD    B
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.b;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.b, 0);
 			break;
 		case 0x81: //ADD    C
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.c;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.c, 0);
 			break;
 		case 0x82: //ADD    D
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.d;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.d, 0);
 			break;
 		case 0x83: //ADD    E
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.e;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.e, 0);
 			break;
 		case 0x84: //ADD    H
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.h;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.h, 0);
 			break;
 		case 0x85: //ADD    L
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.l;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.l, 0);
 			break;
 		case 0x86: //ADD    M
-			uint16_t offset = (state.h<<8) | (state.l);
-			uint16_t answer = (uint16_t) state.a + state.memory[offset];
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.memory[(state.h<<8) | (state.l)], 0);
 			break;
 		case 0x87: //ADD    A
-			uint16_t answer = ((uint16_t) state.a) << 1;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.a, 0);
 			break;
 		case 0x88: //ADC    B
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.b + (uint16_t) state.cc.cy;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.b, state.cc.cy);
 			break;
 		case 0x89: //ADC    C
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.c + (uint16_t) state.cc.cy;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.c, state.cc.cy);
 			break;
 		case 0x8a: //ADC    D
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.d + (uint16_t) state.cc.cy;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.d, state.cc.cy);
 			break;
 		case 0x8b: //ADC    E
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.e + (uint16_t) state.cc.cy;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.e, state.cc.cy);
 			break;
 		case 0x8c: //ADC    H
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.h + (uint16_t) state.cc.cy;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.h, state.cc.cy);
 			break;
 		case 0x8d: //ADC    L
-			uint16_t answer = (uint16_t) state.a + (uint16_t) state.l + (uint16_t) state.cc.cy;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.l, state.cc.cy);
 			break;
 		case 0x8e: //ADC    M
-			uint16_t offset = (state.h<<8) | (state.l);
-			uint16_t answer = (uint16_t) state.a + state.memory[offset] + (uint16_t) state.cc.cy;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.memory[(state.h<<8) | (state.l)], state.cc.cy);
 			break;
 		case 0x8f: //ADC    A
-			uint16_t answer = (((uint16_t) state.a) << 1) + (uint16_t) state.cc.cy;
-			state.cc.z = ((answer & 0xff) == 0);
-			state.cc.s = ((answer & 0x80) != 0);
-			state.cc.cy = (answer > 0xff);
-			state.cc.p = Parity(answer & 0xff)
-			state.a = answer & 0xff;
+			add(state, state.a, state.cc.cy);
 			break;
-		case 0x90:
-			// std::cout << "SUB    B";
+		case 0x90: //SUB    B
+			add(state, ~state.b + 1, state.cc.cy);
 			break;
-		case 0x91:
-			// std::cout << "SUB    C";
+		case 0x91: //SUB    C
+			add(state, ~state.c + 1, state.cc.cy);
 			break;
-		case 0x92:
-			// std::cout << "SUB    D";
+		case 0x92: //SUB    D
+			add(state, ~state.d + 1, state.cc.cy);
 			break;
-		case 0x93:
-			// std::cout << "SUB    E";
+		case 0x93: //SUB    E
+			add(state, ~state.e + 1, state.cc.cy);
 			break;
-		case 0x94:
-			// std::cout << "SUB    H";
+		case 0x94: //SUB    H
+			add(state, ~state.h + 1, state.cc.cy);
 			break;
-		case 0x95:
-			// std::cout << "SUB    L";
+		case 0x95: //SUB    L
+			add(state, ~state.l + 1, state.cc.cy);
 			break;
-		case 0x96:
-			// std::cout << "SUB    M";
+		case 0x96: //SUB    M
+			add(state, ~state.memory[(state.h<<8) | (state.l)] + 1, state.cc.cy);
 			break;
-		case 0x97:
-			// std::cout << "SUB    A";
+		case 0x97: //SUB    A
+			add(state, ~state.a + 1, state.cc.cy);
 			break;
-		case 0x98:
-			// std::cout << "SBB    B";
+		case 0x98: //SBB    B
+			add(state, ~(1+state.b) + 1, state.cc.cy);
 			break;
-		case 0x99:
-			// std::cout << "SBB    C";
+		case 0x99: //SBB    C
+			add(state, ~(1+state.c) + 1, state.cc.cy);
 			break;
-		case 0x9a:
-			// std::cout << "SBB    D";
+		case 0x9a: //SBB    D
+			add(state, ~(1+state.d) + 1, state.cc.cy);
 			break;
-		case 0x9b:
-			// std::cout << "SBB    E";
+		case 0x9b: //SBB    E
+			add(state, ~(1+state.e) + 1, state.cc.cy);
 			break;
-		case 0x9c:
-			// std::cout << "SBB    H";
+		case 0x9c: //SBB    H
+			add(state, ~(1+state.h) + 1, state.cc.cy);
 			break;
-		case 0x9d:
-			// std::cout << "SBB    L";
+		case 0x9d: //SBB    L
+			add(state, ~(1+state.l) + 1, state.cc.cy);
 			break;
-		case 0x9e:
-			// std::cout << "SBB    M";
+		case 0x9e: //SBB    M
+			add(state, ~(1+state.memory[(state.h<<8) | (state.l)]) + 1, state.cc.cy);
 			break;
-		case 0x9f:
-			// std::cout << "SBB    A";
+		case 0x9f: //SBB    A
+			add(state, ~(1+state.a) + 1, state.cc.cy);
 			break;
 		case 0xa0:
 			// std::cout << "ANA    B";
@@ -722,22 +635,18 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xc2:
 			// std::cout << "JNZ    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xc3:
 			// std::cout << "JMP    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xc4:
 			// std::cout << "CNZ    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xc5:
 			// std::cout << "PUSH   B";
 			break;
-		case 0xc6:
-			// std::cout << "ADI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
+		case 0xc6: //ADI
+			add(state, opcode[1], 0);
 			break;
 		case 0xc7:
 			// std::cout << "RST    0";
@@ -750,22 +659,18 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xca:
 			// std::cout << "JZ     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xcb:
 			// std::cout << "NOP";
 			break;
 		case 0xcc:
 			// std::cout << "CZ     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xcd:
 			// std::cout << "CALL   $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xce:
 			// std::cout << "ACI    " << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0xcf:
 			// std::cout << "RST    1";
@@ -778,22 +683,18 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xd2:
 			// std::cout << "JNC    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xd3:
 			// std::cout << "OUT    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0xd4:
 			// std::cout << "CNC    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xd5:
 			// std::cout << "PUSH   D";
 			break;
-		case 0xd6:
-			// std::cout << "SUI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
+		case 0xd6: //SUI
+			add(state, ~opcode[1] + 1, 0);
 			break;
 		case 0xd7:
 			// std::cout << "RST    2";
@@ -806,22 +707,18 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xda:
 			// std::cout << "JC     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xdb:
 			// std::cout << "IN     #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0xdc:
 			// std::cout << "CC     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xdd:
 			// std::cout << "NOP";
 			break;
 		case 0xde:
 			// std::cout << "SBI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0xdf:
 			// std::cout << "RST    3";
@@ -834,21 +731,18 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xe2:
 			// std::cout << "JPO    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xe3:
 			// std::cout << "XTHL";
 			break;
 		case 0xe4:
 			// std::cout << "CPO    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xe5:
 			// std::cout << "PUSH   H";
 			break;
 		case 0xe6:
 			// std::cout << "ANI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0xe7:
 			// std::cout << "RST    4";
@@ -861,21 +755,18 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xea:
 			// std::cout << "JPE    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xeb:
 			// std::cout << "XCHG";
 			break;
 		case 0xec:
 			// std::cout << "CPE    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xed:
 			// std::cout << "NOP";
 			break;
 		case 0xee:
 			// std::cout << "XRI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0xef:
 			// std::cout << "RST    5";
@@ -888,21 +779,18 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xf2:
 			// std::cout << "JP     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xf3:
 			// std::cout << "DI";
 			break;
 		case 0xf4:
 			// std::cout << "CP     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xf5:
 			// std::cout << "PUSH   PSW";
 			break;
 		case 0xf6:
 			// std::cout << "ORI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0xf7:
 			// std::cout << "RST    6";
@@ -915,21 +803,18 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xfa:
 			// std::cout << "JM     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xfb:
 			// std::cout << "EI";
 			break;
 		case 0xfc:
 			// std::cout << "CM     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
-			opBytes = 3;
 			break;
 		case 0xfd:
 			// std::cout << "NOP";
 			break;
 		case 0xfe:
 			// std::cout << "CPI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
-			opBytes = 2;
 			break;
 		case 0xff:
 			// std::cout << "RST    7";
@@ -937,12 +822,17 @@ void Emulate8080Op(State8080& state) {
 	}
 }
 
+void printTest(uint8_t test) {
+	std::cout << std::bitset<16>((uint16_t) test) << std::endl;
+}
+
 int main(int argc, char* argv[]) {
 
-	// unsigned char A, B, C, D, E, H, L;
-	// unsigned char* pc;
-
-	disassembleROM("invaders");
+	uint8_t test = 0x99;
+	printTest(test);
+	printTest(~(test+1));
+	printTest(~(test+1) + 1);
+	printTest(test);
 
 	return 0;
 

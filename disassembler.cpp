@@ -378,10 +378,10 @@ int Disassemble8080Op(std::vector<unsigned char> &codebuffer, unsigned int pc) {
 			std::cout << "MOV    M,H";
 			break;
 		case 0x75:
-			std::cout << "HLT";
+			std::cout << "MOV    M,L";
 			break;
 		case 0x76:
-			std::cout << "MOV    M,M";
+			std::cout << "HLT";
 			break;
 		case 0x77:
 			std::cout << "MOV    M,A";

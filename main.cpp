@@ -243,197 +243,197 @@ void Emulate8080Op(State8080& state) {
 		case 0x3f:
 			// std::cout << "CMC";
 			break;
-		case 0x40:
-			// std::cout << "MOV    B,B";
+		case 0x40: //MOV    B,B
+			state.b = state.b;
 			break;
-		case 0x41:
-			// std::cout << "MOV    B,C";
+		case 0x41: //MOV    B,C
+			state.b = state.c;
 			break;
-		case 0x42:
-			// std::cout << "MOV    B,D";
+		case 0x42: //MOV    B,D
+			state.b = state.d;
 			break;
-		case 0x43:
-			// std::cout << "MOV    B,E";
+		case 0x43: //MOV    B,E
+			state.b = state.e;
 			break;
-		case 0x44:
-			// std::cout << "MOV    B,H";
+		case 0x44: //MOV    B,H
+			state.b = state.h;
 			break;
-		case 0x45:
-			// std::cout << "MOV    B,L";
+		case 0x45: //MOV    B,L
+			state.b = state.l;
 			break;
-		case 0x46:
-			// std::cout << "MOV    B,M";
+		case 0x46: //MOV    B,M
+			state.b = state.memory[(state.h<<8) | (state.l)];
 			break;
-		case 0x47:
-			// std::cout << "MOV    B,A";
+		case 0x47: //MOV    B,A
+			state.b = state.a;
 			break;
-		case 0x48:
-			// std::cout << "MOV    C,B";
+		case 0x48: //MOV    C,B
+			state.c = state.b;
 			break;
-		case 0x49:
-			// std::cout << "MOV    C,C";
+		case 0x49: //MOV    C,C
+			state.c = state.c;
 			break;
-		case 0x4a:
-			// std::cout << "MOV    C,D";
+		case 0x4a: //MOV    C,D
+			state.c = state.d;
 			break;
-		case 0x4b:
-			// std::cout << "MOV    C,E";
+		case 0x4b: //MOV    C,E
+			state.c = state.e;
 			break;
-		case 0x4c:
-			// std::cout << "MOV    C,H";
+		case 0x4c: //MOV    C,H
+			state.c = state.h;
 			break;
-		case 0x4d:
-			// std::cout << "MOV    C,L";
+		case 0x4d: //MOV    C,L
+			state.c = state.l;
 			break;
-		case 0x4e:
-			// std::cout << "MOV    C,M";
+		case 0x4e: //MOV    C,M
+			state.c = state.memory[(state.h<<8) | (state.l)];
 			break;
-		case 0x4f:
-			// std::cout << "MOV    C,A";
+		case 0x4f: //MOV    C,A
+			state.c = state.a;
 			break;
-		case 0x50:
-			// std::cout << "MOV    D,B";
+		case 0x50: //MOV    D,B
+			state.d = state.b;
 			break;
-		case 0x51:
-			// std::cout << "MOV    D,C";
+		case 0x51: //MOV    D,C
+			state.d = state.c;
 			break;
-		case 0x52:
-			// std::cout << "MOV    D,D";
+		case 0x52: //MOV    D,D
+			state.d = state.d;
 			break;
-		case 0x53:
-			// std::cout << "MOV    D,E";
+		case 0x53: //MOV    D,E
+			state.d = state.e;
 			break;
-		case 0x54:
-			// std::cout << "MOV    D,H";
+		case 0x54: //MOV    D,H
+			state.d = state.h;
 			break;
-		case 0x55:
-			// std::cout << "MOV    D,L";
+		case 0x55: //MOV    D,L
+			state.d = state.l;
 			break;
-		case 0x56:
-			// std::cout << "MOV    D,M";
+		case 0x56: //MOV    D,M
+			state.d = state.memory[(state.h<<8) | (state.l)];
 			break;
-		case 0x57:
-			// std::cout << "MOV    D,A";
+		case 0x57: //MOV    D,A
+			state.d = state.a;
 			break;
-		case 0x58:
-			// std::cout << "MOV    E,B";
+		case 0x58: //MOV    E,B
+			state.e = state.b;
 			break;
-		case 0x59:
-			// std::cout << "MOV    E,C";
+		case 0x59: //MOV    E,C
+			state.e = state.c;
 			break;
-		case 0x5a:
-			// std::cout << "MOV    E,D";
+		case 0x5a: //MOV    E,D
+			state.e = state.d;
 			break;
-		case 0x5b:
-			// std::cout << "MOV    E,E";
+		case 0x5b: //MOV    E,E
+			state.e = state.e;
 			break;
-		case 0x5c:
-			// std::cout << "MOV    E,H";
+		case 0x5c: //MOV    E,H
+			state.e = state.h;
 			break;
-		case 0x5d:
-			// std::cout << "MOV    E,L";
+		case 0x5d: //MOV    E,L
+			state.e = state.l;
 			break;
-		case 0x5e:
-			// std::cout << "MOV    E,M";
+		case 0x5e: //MOV    E,M
+			state.e = state.memory[(state.h<<8) | (state.l)];
 			break;
-		case 0x5f:
-			// std::cout << "MOV    E,A";
+		case 0x5f: //MOV    E,A
+			state.e = state.a;
 			break;
-		case 0x60:
-			// std::cout << "MOV    H,B";
+		case 0x60: //MOV    H,B
+			state.h = state.b;
 			break;
-		case 0x61:
-			// std::cout << "MOV    H,C";
+		case 0x61: //MOV    H,C
+			state.h = state.c;
 			break;
-		case 0x62:
-			// std::cout << "MOV    H,D";
+		case 0x62: //MOV    H,D
+			state.h = state.d;
 			break;
-		case 0x63:
-			// std::cout << "MOV    H,E";
+		case 0x63: //MOV    H,E
+			state.h = state.e;
 			break;
-		case 0x64:
-			// std::cout << "MOV    H,H";
+		case 0x64: //MOV    H,H
+			state.h = state.h;
 			break;
-		case 0x65:
-			// std::cout << "MOV    H,L";
+		case 0x65: //MOV    H,L
+			state.h = state.l;
 			break;
-		case 0x66:
-			// std::cout << "MOV    H,M";
+		case 0x66: //MOV    H,M
+			state.h = state.memory[(state.h<<8) | (state.l)];
 			break;
-		case 0x67:
-			// std::cout << "MOV    H,A";
+		case 0x67: //MOV    H,A
+			state.h = state.a;
 			break;
-		case 0x68:
-			// std::cout << "MOV    L,B";
+		case 0x68: //MOV    L,B
+			state.l = state.b;
 			break;
-		case 0x69:
-			// std::cout << "MOV    L,C";
+		case 0x69: //MOV    L,C
+			state.l = state.c;
 			break;
-		case 0x6a:
-			// std::cout << "MOV    L,D";
+		case 0x6a: //MOV    L,D
+			state.l = state.d;
 			break;
-		case 0x6b:
-			// std::cout << "MOV    L,E";
+		case 0x6b: //MOV    L,E
+			state.l = state.e;
 			break;
-		case 0x6c:
-			// std::cout << "MOV    L,H";
+		case 0x6c: //MOV    L,H
+			state.l = state.h;
 			break;
-		case 0x6d:
-			// std::cout << "MOV    L,L";
+		case 0x6d: //MOV    L,L
+			state.l = state.l;
 			break;
-		case 0x6e:
-			// std::cout << "MOV    L,M";
+		case 0x6e: //MOV    L,M
+			state.l = state.memory[(state.h<<8) | (state.l)];
 			break;
-		case 0x6f:
-			// std::cout << "MOV    L,A";
+		case 0x6f: //MOV    L,A
+			state.l = state.a;
 			break;
-		case 0x70:
-			// std::cout << "MOV    M,B";
+		case 0x70: //MOV    M,B
+			state.memory[(state.h<<8) | (state.l)] = state.b;
 			break;
-		case 0x71:
-			// std::cout << "MOV    M,C";
+		case 0x71: //MOV    M,C
+			state.memory[(state.h<<8) | (state.l)] = state.c;
 			break;
-		case 0x72:
-			// std::cout << "MOV    M,D";
+		case 0x72: //MOV    M,D
+			state.memory[(state.h<<8) | (state.l)] = state.d;
 			break;
-		case 0x73:
-			// std::cout << "MOV    M,E";
+		case 0x73: //MOV    M,E
+			state.memory[(state.h<<8) | (state.l)] = state.e;
 			break;
-		case 0x74:
-			// std::cout << "MOV    M,H";
+		case 0x74: //MOV    M,H
+			state.memory[(state.h<<8) | (state.l)] = state.h;
 			break;
-		case 0x75:
-			// std::cout << "HLT";
+		case 0x75: //MOV    M,L
+			state.memory[(state.h<<8) | (state.l)] = state.l;
 			break;
 		case 0x76:
-			// std::cout << "MOV    M,M";
+			//std::cout << "HLT";
 			break;
-		case 0x77:
-			// std::cout << "MOV    M,A";
+		case 0x77: //MOV    M,A
+			state.memory[(state.h<<8) | (state.l)] = state.a;
 			break;
-		case 0x78:
-			// std::cout << "MOV    A,B";
+		case 0x78: //MOV    A,B
+			state.a = state.b;
 			break;
-		case 0x79:
-			// std::cout << "MOV    A,C";
+		case 0x79: //MOV    A,C
+			state.a = state.c;
 			break;
-		case 0x7a:
-			// std::cout << "MOV    A,D";
+		case 0x7a: //MOV    A,D
+			state.a = state.d;
 			break;
-		case 0x7b:
-			// std::cout << "MOV    A,E";
+		case 0x7b: //MOV    A,E
+			state.a = state.e;
 			break;
-		case 0x7c:
-			// std::cout << "MOV    A,H";
+		case 0x7c: //MOV    A,H
+			state.a = state.h;
 			break;
-		case 0x7d:
-			// std::cout << "MOV    A,L";
+		case 0x7d: //MOV    A,L
+			state.a = state.l;
 			break;
-		case 0x7e:
-			// std::cout << "MOV    A,M";
+		case 0x7e: //MOV    A,M
+			state.a = state.memory[(state.h<<8) | (state.l)];
 			break;
-		case 0x7f:
-			// std::cout << "MOV    A,A";
+		case 0x7f: //MOV    A,A
+			state.a = state.a;
 			break;
 		case 0x80: //ADD    B
 			add(state, state.b, 0);

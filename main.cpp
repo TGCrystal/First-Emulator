@@ -47,6 +47,27 @@ void add(State8080& state, uint8_t num, uint16_t carry) {
 	state.a = answer & 0xff;
 }
 
+void call(State8080& state, unsigned char* opcode, bool condition) {
+	if(condition) {
+		uint16_t ret = state.pc + 2;
+		state.memory[state.sp-1] = (ret >> 8) & 0xff;
+		state.memory[state.sp-2] = (ret & 0xff);
+		state.sp -= 2;
+		state.pc = (opcode[2] << 8) | opcode[1];
+	}
+	else
+		state.pc += 2;
+}
+
+void ret(State8080& state, bool condition) {
+	if(condition) {
+		state.pc = state.memory[state.sp] | (state.memory[state.sp+1] << 8);
+		state.sp += 2;
+	}
+	else
+		state.pc += 2;
+}
+
 void Emulate8080Op(State8080& state) {
 	unsigned char* opcode = &state.memory[state.pc];
 	switch(*opcode) {
@@ -195,8 +216,7 @@ void Emulate8080Op(State8080& state) {
 		case 0x2f:
 			// std::cout << "CMA";
 			break;
-		case 0x30:
-			// std::cout << "NOP";
+		case 0x30: //NOP
 			break;
 		case 0x31:
 			// std::cout << "LXI    SP,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
@@ -219,8 +239,7 @@ void Emulate8080Op(State8080& state) {
 		case 0x37:
 			// std::cout << "STC";
 			break;
-		case 0x38: 
-			// std::cout << "NOP";
+		case 0x38: //NOP
 			break;
 		case 0x39: 
 			// std::cout << "DAD    SP";
@@ -627,20 +646,23 @@ void Emulate8080Op(State8080& state) {
 		case 0xbf:
 			// std::cout << "CMP    A";
 			break;
-		case 0xc0:
-			// std::cout << "RNZ";
+		case 0xc0: //RNZ
+			ret(state, !state.cc.z);
 			break;
 		case 0xc1:
 			// std::cout << "POP    B";
 			break;
-		case 0xc2:
-			// std::cout << "JNZ    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xc2: //JNZ
+			if(!state.cc.z)
+				state.pc = (opcode[2] << 8) | opcode[1];
+			else
+				state.pc += 2;
 			break;
-		case 0xc3:
-			// std::cout << "JMP    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xc3: //JMP
+			state.pc = (opcode[2] << 8) | opcode[1];
 			break;
-		case 0xc4:
-			// std::cout << "CNZ    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xc4: //CNZ
+			call(state, opcode, !state.cc.z);
 			break;
 		case 0xc5:
 			// std::cout << "PUSH   B";
@@ -651,44 +673,49 @@ void Emulate8080Op(State8080& state) {
 		case 0xc7:
 			// std::cout << "RST    0";
 			break;
-		case 0xc8:
-			// std::cout << "RZ";
+		case 0xc8: //RZ
+			ret(state, state.cc.z);
 			break;
-		case 0xc9:
-			// std::cout << "RET";
+		case 0xc9: //RET
+			ret(state, true);
 			break;
-		case 0xca:
-			// std::cout << "JZ     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xca: //JZ
+			if(state.cc.z)
+				state.pc = (opcode[2] << 8) | opcode[1];
+			else
+				state.pc += 2;
 			break;
-		case 0xcb:
-			// std::cout << "NOP";
+		case 0xcb: //NOP
 			break;
-		case 0xcc:
-			// std::cout << "CZ     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xcc: //CZ
+			call(state, opcode, state.cc.z);
 			break;
-		case 0xcd:
-			// std::cout << "CALL   $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xcd: //CALL
+			call(state, opcode, true);
 			break;
-		case 0xce:
-			// std::cout << "ACI    " << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0xce: //ACI
+			add(state, opcode[1], state.cc.cy);
 			break;
 		case 0xcf:
 			// std::cout << "RST    1";
 			break;
-		case 0xd0:
-			// std::cout << "RNC";
+		case 0xd0: //RNC
+			ret(state, !state.cc.cy);
 			break;
 		case 0xd1:
 			// std::cout << "POP    D";
 			break;
-		case 0xd2:
-			// std::cout << "JNC    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xd2: //JNC
+			if(!state.cc.cy)
+				state.pc = (opcode[2] << 8) | opcode[1];
+			else
+				state.pc += 2;
 			break;
 		case 0xd3:
 			// std::cout << "OUT    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
 			break;
-		case 0xd4:
-			// std::cout << "CNC    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xd4: //CNC
+			call(state, opcode, !state.cc.cy);
 			break;
 		case 0xd5:
 			// std::cout << "PUSH   D";
@@ -699,44 +726,48 @@ void Emulate8080Op(State8080& state) {
 		case 0xd7:
 			// std::cout << "RST    2";
 			break;
-		case 0xd8:
-			// std::cout << "RC";
+		case 0xd8: //RC
+			ret(state, state.cc.cy);
 			break;
-		case 0xd9:
-			// std::cout << "NOP";
+		case 0xd9: //NOP
 			break;
-		case 0xda:
-			// std::cout << "JC     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xda: //JC
+			if(state.cc.cy)
+				state.pc = (opcode[2] << 8) | opcode[1];
+			else
+				state.pc += 2;
 			break;
 		case 0xdb:
 			// std::cout << "IN     #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
 			break;
-		case 0xdc:
-			// std::cout << "CC     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xdc: //CC
+			call(state, opcode, state.cc.cy);
 			break;
-		case 0xdd:
-			// std::cout << "NOP";
+		case 0xdd: //NOP
 			break;
-		case 0xde:
-			// std::cout << "SBI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0xde: //SBI
+			add(state, ~(opcode[1]+1) + 1, 0);
 			break;
 		case 0xdf:
 			// std::cout << "RST    3";
 			break;
-		case 0xe0:
-			// std::cout << "RPO";
+		case 0xe0: //RPO
+			ret(state, !state.cc.p);
 			break;
 		case 0xe1:
 			// std::cout << "POP    H";
 			break;
-		case 0xe2:
-			// std::cout << "JPO    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xe2: //JPO
+			if(!state.cc.p)
+				state.pc = (opcode[2] << 8) | opcode[1];
+			else
+				state.pc += 2;
 			break;
 		case 0xe3:
 			// std::cout << "XTHL";
 			break;
-		case 0xe4:
-			// std::cout << "CPO    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xe4: //CPO
+			call(state, opcode, !state.cc.p);
 			break;
 		case 0xe5:
 			// std::cout << "PUSH   H";
@@ -747,23 +778,25 @@ void Emulate8080Op(State8080& state) {
 		case 0xe7:
 			// std::cout << "RST    4";
 			break;
-		case 0xe8:
-			// std::cout << "RPE";
+		case 0xe8: //RPE
+			ret(state, state.cc.p);
 			break;
-		case 0xe9:
-			// std::cout << "PCHL";
+		case 0xe9: //PCHL
+			state.pc = (state.h<<8) | (state.l);
 			break;
-		case 0xea:
-			// std::cout << "JPE    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xea: //JPE
+			if(state.cc.p)
+				state.pc = (opcode[2] << 8) | opcode[1];
+			else
+				state.pc += 2;
 			break;
 		case 0xeb:
 			// std::cout << "XCHG";
 			break;
-		case 0xec:
-			// std::cout << "CPE    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xec: //CPE
+			call(state, opcode, state.cc.p);
 			break;
-		case 0xed:
-			// std::cout << "NOP";
+		case 0xed: //NOP
 			break;
 		case 0xee:
 			// std::cout << "XRI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -771,20 +804,23 @@ void Emulate8080Op(State8080& state) {
 		case 0xef:
 			// std::cout << "RST    5";
 			break;
-		case 0xf0:
-			// std::cout << "RP";
+		case 0xf0: //RP
+			ret(state, !state.cc.s);
 			break;
 		case 0xf1:
 			// std::cout << "POP    PSW";
 			break;
-		case 0xf2:
-			// std::cout << "JP     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xf2: //JP
+			if(!state.cc.s)
+				state.pc = (opcode[2] << 8) | opcode[1];
+			else
+				state.pc += 2;
 			break;
 		case 0xf3:
 			// std::cout << "DI";
 			break;
-		case 0xf4:
-			// std::cout << "CP     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xf4: //CP
+			call(state, opcode, !state.cc.s);
 			break;
 		case 0xf5:
 			// std::cout << "PUSH   PSW";
@@ -795,23 +831,25 @@ void Emulate8080Op(State8080& state) {
 		case 0xf7:
 			// std::cout << "RST    6";
 			break;
-		case 0xf8:
-			// std::cout << "RM";
+		case 0xf8: //RM
+			ret(state, state.cc.s);
 			break;
 		case 0xf9:
 			// std::cout << "SPHL";
 			break;
-		case 0xfa:
-			// std::cout << "JM     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xfa: //JM
+			if(state.cc.s)
+				state.pc = (opcode[2] << 8) | opcode[1];
+			else
+				state.pc += 2;
 			break;
 		case 0xfb:
 			// std::cout << "EI";
 			break;
-		case 0xfc:
-			// std::cout << "CM     $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0xfc: //CM
+			call(state, opcode, state.cc.s);
 			break;
-		case 0xfd:
-			// std::cout << "NOP";
+		case 0xfd: //NOP
 			break;
 		case 0xfe:
 			// std::cout << "CPI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -820,6 +858,7 @@ void Emulate8080Op(State8080& state) {
 			// std::cout << "RST    7";
 			break;
 	}
+	state.pc += 1;
 }
 
 void printTest(uint8_t test) {

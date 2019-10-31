@@ -68,6 +68,43 @@ void ret(State8080& state, bool condition) {
 		state.pc += 2;
 }
 
+void ana(State8080& state, uint8_t num) {
+	state.a = state.a & num;
+	state.cc.z = ((answer & 0xff) == 0);
+	state.cc.s = ((answer & 0x80) != 0);
+	state.cc.cy = 0;
+	state.cc.p = Parity(answer);
+	state.cc.ac = 0;
+}
+
+void xra(State8080& state, uint8_t num) {
+	state.a = state.a ^ num;
+	state.cc.z = ((answer & 0xff) == 0);
+	state.cc.s = ((answer & 0x80) != 0);
+	state.cc.cy = 0;
+	state.cc.p = Parity(answer);
+	state.cc.ac = 0;
+}
+
+void ora(State8080& state, uint8_t num) {
+	state.a = state.a | num;
+	state.cc.z = ((answer & 0xff) == 0);
+	state.cc.s = ((answer & 0x80) != 0);
+	state.cc.cy = 0;
+	state.cc.p = Parity(answer);
+	state.cc.ac = 0;
+}
+
+void cmp(State8080& state, uint8_t num) {
+	uint8_t tmp = ~num;
+	uint16_t answer = (uint16_t) state.a + (uint16_t) tmp + 1;
+	state.cc.z = ((answer & 0xff) == 0);
+	state.cc.s = ((answer & 0x80) != 0);
+	state.cc.cy = (num > state.a);
+	state.cc.p = Parity(answer & 0xff);
+	state.cc.ac = ((state.a & 0x0f) + (tmp & 0x0f)) > 0x0f;
+}
+
 void Emulate8080Op(State8080& state) {
 	unsigned char* opcode = &state.memory[state.pc];
 	switch(*opcode) {
@@ -168,7 +205,7 @@ void Emulate8080Op(State8080& state) {
 		case 0x1f:
 			// std::cout << "RAR";
 			break;
-		case 0x20:
+		case 0x20: //unknown
 			// std::cout << "RIM";
 			break;
 		case 0x21:
@@ -236,8 +273,8 @@ void Emulate8080Op(State8080& state) {
 		case 0x36: 
 			// std::cout << "MVI    M,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
 			break;
-		case 0x37:
-			// std::cout << "STC";
+		case 0x37: //STC
+			state.cc.cy = 1;
 			break;
 		case 0x38: //NOP
 			break;
@@ -259,8 +296,8 @@ void Emulate8080Op(State8080& state) {
 		case 0x3e: 
 			// std::cout << "MVI    A,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
 			break;
-		case 0x3f:
-			// std::cout << "CMC";
+		case 0x3f: //CMC
+			state.cc.cy = !state.cc.cy;
 			break;
 		case 0x40: //MOV    B,B
 			state.b = state.b;
@@ -425,7 +462,7 @@ void Emulate8080Op(State8080& state) {
 			state.memory[(state.h<<8) | (state.l)] = state.l;
 			break;
 		case 0x76:
-			//std::cout << "HLT";
+			exit(0);
 			break;
 		case 0x77: //MOV    M,A
 			state.memory[(state.h<<8) | (state.l)] = state.a;
@@ -550,101 +587,101 @@ void Emulate8080Op(State8080& state) {
 		case 0x9f: //SBB    A
 			add(state, ~(1+state.a) + 1, state.cc.cy);
 			break;
-		case 0xa0:
-			// std::cout << "ANA    B";
+		case 0xa0: //ANA    B
+			ana(state, state.b);
 			break;
-		case 0xa1:
-			// std::cout << "ANA    C";
+		case 0xa1: //ANA    C
+			ana(state, state.c);
 			break;
-		case 0xa2:
-			// std::cout << "ANA    D";
+		case 0xa2: //ANA    D
+			ana(state, state.d);
 			break;
-		case 0xa3:
-			// std::cout << "ANA    E";
+		case 0xa3: //ANA    E
+			ana(state, state.e);
 			break;
-		case 0xa4:
-			// std::cout << "ANA    H";
+		case 0xa4: //ANA    H
+			ana(state, state.h);
 			break;
-		case 0xa5:
-			// std::cout << "ANA    L";
+		case 0xa5: //ANA    L
+			ana(state, state.l);
 			break;
-		case 0xa6:
-			// std::cout << "ANA    M";
+		case 0xa6: //ANA    M
+			ana(state, state.memory[(state.h<<8) | (state.l)]);
 			break;
-		case 0xa7:
-			// std::cout << "ANA    A";
+		case 0xa7: //ANA    A
+			ana(state, state.a);
 			break;
-		case 0xa8:
-			// std::cout << "XRA    B";
+		case 0xa8: //XRA    B
+			xra(state, state.b);
 			break;
-		case 0xa9:
-			// std::cout << "XRA    C";
+		case 0xa9: //XRA    C
+			xra(state, state.c);
 			break;
-		case 0xaa:
-			// std::cout << "XRA    D";
+		case 0xaa: //XRA    D
+			xra(state, state.d);
 			break;
-		case 0xab:
-			// std::cout << "XRA    E";
+		case 0xab: //XRA    E
+			xra(state, state.e);
 			break;
-		case 0xac:
-			// std::cout << "XRA    H";
+		case 0xac: //XRA    H
+			xra(state, state.h);
 			break;
-		case 0xad:
-			// std::cout << "XRA    L";
+		case 0xad: //XRA    L
+			xra(state, state.l);
 			break;
-		case 0xae:
-			// std::cout << "XRA    M";
+		case 0xae: //XRA    M
+			xra(state, state.memory[(state.h<<8) | (state.l)]);
 			break;
-		case 0xaf:
-			// std::cout << "XRA    A";
+		case 0xaf: //XRA    A
+			xra(state, state.a);
 			break;
-		case 0xb0:
-			// std::cout << "ORA    B";
+		case 0xb0: //ORA    B
+			ora(state, state.b);
 			break;
-		case 0xb1:
-			// std::cout << "ORA    C";
+		case 0xb1: //ORA    C
+			ora(state, state.c);
 			break;
-		case 0xb2:
-			// std::cout << "ORA    D";
+		case 0xb2: //ORA    D
+			ora(state, state.d);
 			break;
-		case 0xb3:
-			// std::cout << "ORA    E";
+		case 0xb3: //ORA    E
+			ora(state, state.e);
 			break;
-		case 0xb4:
-			// std::cout << "ORA    H";
+		case 0xb4: //ORA    H
+			ora(state, state.h);
 			break;
-		case 0xb5:
-			// std::cout << "ORA    L";
+		case 0xb5: //ORA    L
+			ora(state, state.l);
 			break;
-		case 0xb6:
-			// std::cout << "ORA    M";
+		case 0xb6: //ORA    M
+			ora(state, state.memory[(state.h<<8) | (state.l)]);
 			break;
-		case 0xb7:
-			// std::cout << "ORA    A";
+		case 0xb7: //ORA    A
+			ora(state, state.a);
 			break;
-		case 0xb8:
-			// std::cout << "CMP    B";
+		case 0xb8: //CMP    B
+			cmp(state, state.b);
 			break;
-		case 0xb9:
-			// std::cout << "CMP    C";
+		case 0xb9: //CMP    C
+			cmp(state, state.c);
 			break;
-		case 0xba:
-			// std::cout << "CMP    D";
+		case 0xba: //CMP    D
+			cmp(state, state.d);
 			break;
-		case 0xbb:
-			// std::cout << "CMP    E";
+		case 0xbb: //CMP    E
+			cmp(state, state.e);
 			break;
-		case 0xbc:
-			// std::cout << "CMP    H";
+		case 0xbc: //CMP    H
+			cmp(state, state.h);
 			break;
-		case 0xbd:
-			// std::cout << "CMP    L";
+		case 0xbd: //CMP    L
+			cmp(state, state.l);
 			break;
-		case 0xbe:
-			// std::cout << "CMP    M";
+		case 0xbe: //CMP    M
+			cmp(state, state.memory[(state.h<<8) | (state.l)]);
 			break;
-		case 0xbf:
-			// std::cout << "CMP    A";
+		case 0xbf: //CMP    A
+			cmp(state, state.a);
 			break;
 		case 0xc0: //RNZ
 			ret(state, !state.cc.z);
@@ -669,6 +706,7 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xc6: //ADI
 			add(state, opcode[1], 0);
+			state++;
 			break;
 		case 0xc7:
 			// std::cout << "RST    0";
@@ -711,8 +749,8 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xd3:
-			// std::cout << "OUT    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0xd3: //OUT
+			state.pc++;
 			break;
 		case 0xd4: //CNC
 			call(state, opcode, !state.cc.cy);
@@ -722,6 +760,7 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xd6: //SUI
 			add(state, ~opcode[1] + 1, 0);
+			state.pc++;
 			break;
 		case 0xd7:
 			// std::cout << "RST    2";
@@ -737,8 +776,8 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xdb:
-			// std::cout << "IN     #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0xdb: //IN
+			state.pc++;
 			break;
 		case 0xdc: //CC
 			call(state, opcode, state.cc.cy);
@@ -816,8 +855,8 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xf3:
-			// std::cout << "DI";
+		case 0xf3: //DI
+			state.int_enable = 0;
 			break;
 		case 0xf4: //CP
 			call(state, opcode, !state.cc.s);
@@ -843,16 +882,17 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xfb:
-			// std::cout << "EI";
+		case 0xfb: //EI
+			state.int_enable = 1;
 			break;
 		case 0xfc: //CM
 			call(state, opcode, state.cc.s);
 			break;
 		case 0xfd: //NOP
 			break;
-		case 0xfe:
-			// std::cout << "CPI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0xfe: //CPI
+			cmp(state, opcode[1]);
+			state.pc++;
 			break;
 		case 0xff:
 			// std::cout << "RST    7";

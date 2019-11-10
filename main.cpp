@@ -686,8 +686,10 @@ void Emulate8080Op(State8080& state) {
 		case 0xc0: //RNZ
 			ret(state, !state.cc.z);
 			break;
-		case 0xc1:
-			// std::cout << "POP    B";
+		case 0xc1: //POP    B
+			state.c = state.memory[state.sp];
+			state.b = state.memory[state.sp+1];
+			state.sp += 2;
 			break;
 		case 0xc2: //JNZ
 			if(!state.cc.z)
@@ -701,8 +703,10 @@ void Emulate8080Op(State8080& state) {
 		case 0xc4: //CNZ
 			call(state, opcode, !state.cc.z);
 			break;
-		case 0xc5:
-			// std::cout << "PUSH   B";
+		case 0xc5: //PUSH   B
+			state.memory[state.sp-1] = state.b;    
+            state.memory[state.sp-2] = state.c;    
+            state.sp -= 2;
 			break;
 		case 0xc6: //ADI
 			add(state, opcode[1], 0);
@@ -740,8 +744,10 @@ void Emulate8080Op(State8080& state) {
 		case 0xd0: //RNC
 			ret(state, !state.cc.cy);
 			break;
-		case 0xd1:
-			// std::cout << "POP    D";
+		case 0xd1: //POP    D
+			state.d = state.memory[state.sp];
+			state.e = state.memory[state.sp+1];
+			state.sp += 2;
 			break;
 		case 0xd2: //JNC
 			if(!state.cc.cy)
@@ -755,8 +761,10 @@ void Emulate8080Op(State8080& state) {
 		case 0xd4: //CNC
 			call(state, opcode, !state.cc.cy);
 			break;
-		case 0xd5:
-			// std::cout << "PUSH   D";
+		case 0xd5: //PUSH   D
+			state.memory[state.sp-1] = state.d;    
+            state.memory[state.sp-2] = state.e;    
+            state.sp -= 2;
 			break;
 		case 0xd6: //SUI
 			add(state, ~opcode[1] + 1, 0);
@@ -793,8 +801,10 @@ void Emulate8080Op(State8080& state) {
 		case 0xe0: //RPO
 			ret(state, !state.cc.p);
 			break;
-		case 0xe1:
-			// std::cout << "POP    H";
+		case 0xe1: //POP    H
+			state.h = state.memory[state.sp];
+			state.l = state.memory[state.sp+1];
+			state.sp += 2;
 			break;
 		case 0xe2: //JPO
 			if(!state.cc.p)
@@ -802,14 +812,18 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xe3:
-			// std::cout << "XTHL";
+		case 0xe3: //XTHL
+			uint8_t tmp = state.l;
+			state.l = memory[state.sp];
+			memory[state.sp] = state.l;
 			break;
 		case 0xe4: //CPO
 			call(state, opcode, !state.cc.p);
 			break;
-		case 0xe5:
-			// std::cout << "PUSH   H";
+		case 0xe5: //PUSH   H
+			state.memory[state.sp-1] = state.h;    
+            state.memory[state.sp-2] = state.l;    
+            state.sp -= 2;
 			break;
 		case 0xe6:
 			// std::cout << "ANI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -846,8 +860,14 @@ void Emulate8080Op(State8080& state) {
 		case 0xf0: //RP
 			ret(state, !state.cc.s);
 			break;
-		case 0xf1:
-			// std::cout << "POP    PSW";
+		case 0xf1: //POP    PSW
+			state.a = state.memory[state.sp+1];  
+            state.cc.z  = (0x01 == (state.memory[state.sp] & 0x01));    
+            state.cc.s  = (0x02 == (state.memory[state.sp] & 0x02));    
+            state.cc.p  = (0x04 == (state.memory[state.sp] & 0x04));    
+            state.cc.cy = (0x05 == (state.memory[state.sp] & 0x08));    
+            state.cc.ac = (0x10 == (state.memory[state.sp] & 0x10));    
+            state.sp += 2; 
 			break;
 		case 0xf2: //JP
 			if(!state.cc.s)
@@ -861,8 +881,14 @@ void Emulate8080Op(State8080& state) {
 		case 0xf4: //CP
 			call(state, opcode, !state.cc.s);
 			break;
-		case 0xf5:
-			// std::cout << "PUSH   PSW";
+		case 0xf5: //PUSH   PSW
+			state.memory[state.sp-1] = state.a;
+            state.memory[state.sp-2] = (state.cc.z |
+                            state.cc.s << 1 |
+                            state.cc.p << 2 |
+                            state.cc.cy << 3 |
+                            state.cc.ac << 4 );
+            state.sp -= 2;
 			break;
 		case 0xf6:
 			// std::cout << "ORI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -873,8 +899,8 @@ void Emulate8080Op(State8080& state) {
 		case 0xf8: //RM
 			ret(state, state.cc.s);
 			break;
-		case 0xf9:
-			// std::cout << "SPHL";
+		case 0xf9: //SPHL
+			state.sp = (state.h << 8) | state.l;
 			break;
 		case 0xfa: //JM
 			if(state.cc.s)

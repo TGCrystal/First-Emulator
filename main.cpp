@@ -191,8 +191,10 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x10: //NOP
 			break;
-		case 0x11:
-			// std::cout << "LXI    D,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0x11: //LXI    D,word
+			state.e = opcode[1];
+			state.d = opcode[2];
+			state.pc += 2;
 			break;
 		case 0x12:  //STAX   D
 			state.memory[(state.d<<8) | (state.e)] = state.a;
@@ -263,8 +265,10 @@ void Emulate8080Op(State8080& state) {
 		case 0x20: //unknown
 			// std::cout << "RIM";
 			break;
-		case 0x21:
-			// std::cout << "LXI    H,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0x21: //LXI    H,word
+			state.l = opcode[1];
+			state.h = opcode[2];
+			state.pc += 2;
 			break;
 		case 0x22:
 			// std::cout << "SHLD   $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
@@ -330,8 +334,9 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x30: //NOP
 			break;
-		case 0x31:
-			// std::cout << "LXI    SP,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0x31: //LXI    SP,word
+			state.sp = (opcode[2]<<8) | opcode[1];
+			state.pc += 2;
 			break;
 		case 0x32:
 			// std::cout << "STA    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];

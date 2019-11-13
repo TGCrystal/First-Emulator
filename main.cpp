@@ -140,8 +140,9 @@ void Emulate8080Op(State8080& state) {
 			state.cc.s = ((state.b & 0x80) != 0);
 			state.cc.p = Parity(state.b);
 			break;
-		case 0x06: 
-			// std::cout << "MVI    B,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0x06: //MVI    B
+			state.b = opcode[1];
+			state.pc++;
 			break;
 		case 0x07:
 			// std::cout << "RLC";
@@ -171,8 +172,9 @@ void Emulate8080Op(State8080& state) {
 			state.cc.s = ((state.c & 0x80) != 0);
 			state.cc.p = Parity(state.c);
 			break;
-		case 0x0e: 
-			// std::cout << "MVI    C,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0x0e: //MVI    C
+			state.c = opcode[1];
+			state.pc++;
 			break;
 		case 0x0f:
 			// std::cout << "RRC";
@@ -205,8 +207,9 @@ void Emulate8080Op(State8080& state) {
 			state.cc.s = ((state.d & 0x80) != 0);
 			state.cc.p = Parity(state.d);
 			break;
-		case 0x16: 
-			// std::cout << "MVI    D,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0x16: //MVI    D
+			state.d = opcode[1];
+			state.pc++;
 			break;
 		case 0x17:
 			// std::cout << "RAL";
@@ -236,8 +239,9 @@ void Emulate8080Op(State8080& state) {
 			state.cc.s = ((state.e & 0x80) != 0);
 			state.cc.p = Parity(state.e);
 			break;
-		case 0x1e: 
-			// std::cout << "MVI    E,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0x1e: //MVI    E
+			state.e = opcode[1];
+			state.pc++;
 			break;
 		case 0x1f:
 			// std::cout << "RAR";
@@ -271,8 +275,9 @@ void Emulate8080Op(State8080& state) {
 			state.cc.s = ((state.h & 0x80) != 0);
 			state.cc.p = Parity(state.h);
 			break;
-		case 0x26: 
-			// std::cout << "MVI    H,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0x26: //MVI    H
+			state.h = opcode[1];
+			state.pc++;
 			break;
 		case 0x27:
 			// std::cout << "DAA";
@@ -302,8 +307,9 @@ void Emulate8080Op(State8080& state) {
 			state.cc.s = ((state.l & 0x80) != 0);
 			state.cc.p = Parity(state.l);
 			break;
-		case 0x2e: 
-			// std::cout << "MVI    L,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0x2e: //MVI    L
+			state.l = opcode[1];
+			state.pc++;
 			break;
 		case 0x2f:
 			// std::cout << "CMA";
@@ -333,8 +339,9 @@ void Emulate8080Op(State8080& state) {
 			state.cc.s = ((state.memory[(state.h<<8) | (state.l)] & 0x80) != 0);
 			state.cc.p = Parity(state.memory[(state.h<<8) | (state.l)]);
 			break;
-		case 0x36: 
-			// std::cout << "MVI    M,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0x36: //MVI    M
+			state.memory[(state.h<<8) | (state.l)] = opcode[1];
+			state.pc++;
 			break;
 		case 0x37: //STC
 			state.cc.cy = 1;
@@ -364,8 +371,9 @@ void Emulate8080Op(State8080& state) {
 			state.cc.s = ((state.a & 0x80) != 0);
 			state.cc.p = Parity(state.a);
 			break;
-		case 0x3e: 
-			// std::cout << "MVI    A,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0x3e: //MVI    A
+			state.a = opcode[1];
+			state.pc++;
 			break;
 		case 0x3f: //CMC
 			state.cc.cy = !state.cc.cy;

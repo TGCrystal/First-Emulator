@@ -105,6 +105,14 @@ void cmp(State8080& state, uint8_t num) {
 	state.cc.ac = ((state.a & 0x0f) + (tmp & 0x0f)) > 0x0f;
 }
 
+void dad(State8080& state, uint16_t num) {
+	uint32_t tmp = (state.h<<8 | state.l) + num;
+	state.cc.cy = (tmp > 0xffff);
+	uint16_t answer = tmp & 0xffff;
+	state.h = answer>>8;
+	state.l = tmp & 0xff;
+}
+
 void Emulate8080Op(State8080& state) {
 	unsigned char* opcode = &state.memory[state.pc];
 	uint8_t temp8;
@@ -150,8 +158,8 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x08: //NOP
 			break;
-		case 0x09: 
-			// std::cout << "DAD    B";
+		case 0x09: //DAD    B
+			dad(state, (state.b<<8)|state.c);
 			break;
 		case 0x0a: //LDAX   B
 			state.a = state.memory[(state.b<<8) | (state.c)];
@@ -220,10 +228,10 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x18: //NOP
 			break;
-		case 0x19: 
-			// std::cout << "DAD    D";
+		case 0x19: //DAD    D
+			dad(state, (state.d<<8)|state.e);
 			break;
-		case 0x1a:  //LDAX   D
+		case 0x1a: //LDAX   D
 			state.a = state.memory[(state.d<<8) | (state.e)];
 			break;
 		case 0x1b: 
@@ -290,8 +298,8 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x28: //NOP
 			break;
-		case 0x29: 
-			// std::cout << "DAD    H";
+		case 0x29: //DAD    H
+			dad(state, (state.h<<8)|state.l);
 			break;
 		case 0x2a: 
 			// std::cout << "LHLD   $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];

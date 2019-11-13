@@ -164,8 +164,10 @@ void Emulate8080Op(State8080& state) {
 		case 0x0a: //LDAX   B
 			state.a = state.memory[(state.b<<8) | (state.c)];
 			break;
-		case 0x0b: 
-			// std::cout << "DCX    B";
+		case 0x0b: //DCX    B
+			temp16 = (state.b<<8) | state.c;
+			state.b = temp16>>8;
+			state.c = temp16&0xff;
 			break;
 		case 0x0c: //INR    C
 			state.cc.ac = ((state.c & 0x0f) + 1) > 0x0f;
@@ -236,8 +238,10 @@ void Emulate8080Op(State8080& state) {
 		case 0x1a: //LDAX   D
 			state.a = state.memory[(state.d<<8) | (state.e)];
 			break;
-		case 0x1b: 
-			// std::cout << "DCX    D";
+		case 0x1b: //DCX    D
+			temp16 = (state.d<<8) | state.e;
+			state.d = temp16>>8;
+			state.e = temp16&0xff;
 			break;
 		case 0x1c: //INR    E
 			state.cc.ac = ((state.e & 0x0f) + 1) > 0x0f;
@@ -308,8 +312,10 @@ void Emulate8080Op(State8080& state) {
 		case 0x2a: 
 			// std::cout << "LHLD   $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
 			break;
-		case 0x2b: 
-			// std::cout << "DCX    H";
+		case 0x2b: //DCX    H
+			temp16 = (state.h<<8) | state.l;
+			state.h = temp16>>8;
+			state.l = temp16&0xff;
 			break;
 		case 0x2c:  //INR    L
 			state.cc.ac = ((state.l & 0x0f) + 1) > 0x0f;
@@ -367,14 +373,14 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0x38: //NOP
 			break;
-		case 0x39: 
-			// std::cout << "DAD    SP";
+		case 0x39: //DAD    SP
+			dad(state, state.sp);
 			break;
 		case 0x3a: 
 			// std::cout << "LDA    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
 			break;
-		case 0x3b: 
-			// std::cout << "DCX    SP";
+		case 0x3b: //DCX    SP
+			state.sp--;
 			break;
 		case 0x3c: //INR    A
 			state.cc.ac = ((state.a & 0x0f) + 1) > 0x0f;

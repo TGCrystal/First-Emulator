@@ -7,11 +7,11 @@
 #include "disassembler.h"
 
 struct ConditionCodes {
-	uint8_t z = 1;
-	uint8_t s = 1;
-	uint8_t p = 1;
-	uint8_t cy = 1;
-	uint8_t ac = 1;
+	uint8_t z = 1; //zero
+	uint8_t s = 1; //sign
+	uint8_t p = 1; //parity
+	uint8_t cy = 1; //carry
+	uint8_t ac = 1; //auxillary carry
 	uint8_t pad = 3;
 };
 
@@ -144,8 +144,9 @@ void Emulate8080Op(State8080& state) {
 			state.b = opcode[1];
 			state.pc++;
 			break;
-		case 0x07:
-			// std::cout << "RLC";
+		case 0x07: //RLC
+			state.cc.cy = state.a & 0x80;
+			state.a = (state.a<<1) | state.cc.cy;
 			break;
 		case 0x08: //NOP
 			break;
@@ -176,8 +177,9 @@ void Emulate8080Op(State8080& state) {
 			state.c = opcode[1];
 			state.pc++;
 			break;
-		case 0x0f:
-			// std::cout << "RRC";
+		case 0x0f: //RRC
+			state.cc.cy = state.a & 0x01;
+			state.a = (state.a<<1) | (state.cc.cy<<7);
 			break;
 		case 0x10: //NOP
 			break;
@@ -211,8 +213,10 @@ void Emulate8080Op(State8080& state) {
 			state.d = opcode[1];
 			state.pc++;
 			break;
-		case 0x17:
-			// std::cout << "RAL";
+		case 0x17: //RAL
+			temp8 = state.cc.cy;
+			state.cc.cy = state.a & 0x80;
+			state.a = (state.a<<1) | temp8;
 			break;
 		case 0x18: //NOP
 			break;
@@ -243,8 +247,10 @@ void Emulate8080Op(State8080& state) {
 			state.e = opcode[1];
 			state.pc++;
 			break;
-		case 0x1f:
-			// std::cout << "RAR";
+		case 0x1f: //RAR
+			temp8 = state.cc.cy;
+			state.cc.cy = state.a & 0x01;
+			state.a = (state.a<<1) | (temp8<<7);
 			break;
 		case 0x20: //unknown
 			// std::cout << "RIM";

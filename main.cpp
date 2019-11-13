@@ -124,17 +124,21 @@ void Emulate8080Op(State8080& state) {
 			temp16 = (state.b<<8) | (state.c);
 			temp16++;
 			state.b = temp16 >> 8;
-			state.c = temp16 & 0x0f;
+			state.c = temp16 & 0xff;
 			break;
 		case 0x04: //INR    B
-			state.cc.ac = ((state.b & 0x0f) + 1) & 0x10;
+			state.cc.ac = ((state.b & 0x0f) + 1) > 0x0f;
 			state.b++;
 			state.cc.z = ((state.b & 0xff) == 0);
 			state.cc.s = ((state.b & 0x80) != 0);
 			state.cc.p = Parity(state.b);
 			break;
-		case 0x05: 
-			// std::cout << "DCR    B";
+		case 0x05: //DCR    B
+			state.cc.ac = ((state.b & 0x0f) + 0x0f) > 0x0f;
+			state.b--;
+			state.cc.z = ((state.b & 0xff) == 0);
+			state.cc.s = ((state.b & 0x80) != 0);
+			state.cc.p = Parity(state.b);
 			break;
 		case 0x06: 
 			// std::cout << "MVI    B,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -154,14 +158,18 @@ void Emulate8080Op(State8080& state) {
 			// std::cout << "DCX    B";
 			break;
 		case 0x0c: //INR    C
-			state.cc.ac = ((state.c & 0x0f) + 1) & 0x10;
+			state.cc.ac = ((state.c & 0x0f) + 1) > 0x0f;
 			state.c++;
 			state.cc.z = ((state.c & 0xff) == 0);
 			state.cc.s = ((state.c & 0x80) != 0);
 			state.cc.p = Parity(state.c);
 			break;
-		case 0x0d: 
-			// std::cout << "DCR    C";
+		case 0x0d: //DCR    C
+			state.cc.ac = ((state.c & 0x0f) + 0x0f) > 0x0f;
+			state.c--;
+			state.cc.z = ((state.c & 0xff) == 0);
+			state.cc.s = ((state.c & 0x80) != 0);
+			state.cc.p = Parity(state.c);
 			break;
 		case 0x0e: 
 			// std::cout << "MVI    C,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -181,17 +189,21 @@ void Emulate8080Op(State8080& state) {
 			temp16 = (state.d<<8) | (state.e);
 			temp16++;
 			state.d = temp16 >> 8;
-			state.e = temp16 & 0x0f;
+			state.e = temp16 & 0xff;
 			break;
 		case 0x14: //INR    D
-			state.cc.ac = ((state.d & 0x0f) + 1) & 0x10;
+			state.cc.ac = ((state.d & 0x0f) + 1) > 0x0f;
 			state.d++;
 			state.cc.z = ((state.d & 0xff) == 0);
 			state.cc.s = ((state.d & 0x80) != 0);
 			state.cc.p = Parity(state.d);
 			break;
-		case 0x15: 
-			// std::cout << "DCR    D";
+		case 0x15: //DCR    D
+			state.cc.ac = ((state.d & 0x0f) + 0x0f) > 0x0f;
+			state.d--;
+			state.cc.z = ((state.d & 0xff) == 0);
+			state.cc.s = ((state.d & 0x80) != 0);
+			state.cc.p = Parity(state.d);
 			break;
 		case 0x16: 
 			// std::cout << "MVI    D,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -211,14 +223,18 @@ void Emulate8080Op(State8080& state) {
 			// std::cout << "DCX    D";
 			break;
 		case 0x1c: //INR    E
-			state.cc.ac = ((state.e & 0x0f) + 1) & 0x10;
+			state.cc.ac = ((state.e & 0x0f) + 1) > 0x0f;
 			state.e++;
 			state.cc.z = ((state.e & 0xff) == 0);
 			state.cc.s = ((state.e & 0x80) != 0);
 			state.cc.p = Parity(state.e);
 			break;
-		case 0x1d: 
-			// std::cout << "DCR    E";
+		case 0x1d: //DCR    E
+			state.cc.ac = ((state.e & 0x0f) + 0x0f) > 0x0f;
+			state.e--;
+			state.cc.z = ((state.e & 0xff) == 0);
+			state.cc.s = ((state.e & 0x80) != 0);
+			state.cc.p = Parity(state.e);
 			break;
 		case 0x1e: 
 			// std::cout << "MVI    E,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -239,17 +255,21 @@ void Emulate8080Op(State8080& state) {
 			temp16 = (state.h<<8) | (state.l);
 			temp16++;
 			state.h = temp16 >> 8;
-			state.l = temp16 & 0x0f;
+			state.l = temp16 & 0xff;
 			break;
 		case 0x24: //INR    H
-			state.cc.ac = ((state.h & 0x0f) + 1) & 0x10;
+			state.cc.ac = ((state.h & 0x0f) + 1) > 0x0f;
 			state.h++;
 			state.cc.z = ((state.h & 0xff) == 0);
 			state.cc.s = ((state.h & 0x80) != 0);
 			state.cc.p = Parity(state.h);
 			break;
-		case 0x25: 
-			// std::cout << "DCR    H";
+		case 0x25: //DCR    H
+			state.cc.ac = ((state.h & 0x0f) + 0x0f) > 0x0f;
+			state.h--;
+			state.cc.z = ((state.h & 0xff) == 0);
+			state.cc.s = ((state.h & 0x80) != 0);
+			state.cc.p = Parity(state.h);
 			break;
 		case 0x26: 
 			// std::cout << "MVI    H,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -269,14 +289,18 @@ void Emulate8080Op(State8080& state) {
 			// std::cout << "DCX    H";
 			break;
 		case 0x2c:  //INR    L
-			state.cc.ac = ((state.l & 0x0f) + 1) & 0x10;
+			state.cc.ac = ((state.l & 0x0f) + 1) > 0x0f;
 			state.l++;
 			state.cc.z = ((state.l & 0xff) == 0);
 			state.cc.s = ((state.l & 0x80) != 0);
 			state.cc.p = Parity(state.l);
 			break;
-		case 0x2d: 
-			// std::cout << "DCR    L";
+		case 0x2d: //DCR    L
+			state.cc.ac = ((state.l & 0x0f) + 0x0f) > 0x0f;
+			state.l--;
+			state.cc.z = ((state.l & 0xff) == 0);
+			state.cc.s = ((state.l & 0x80) != 0);
+			state.cc.p = Parity(state.l);
 			break;
 		case 0x2e: 
 			// std::cout << "MVI    L,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -296,14 +320,18 @@ void Emulate8080Op(State8080& state) {
 			state.sp++;
 			break;
 		case 0x34:  //INR    M
-			state.cc.ac = ((state.memory[(state.h<<8) | (state.l)] & 0x0f) + 1) & 0x10;
+			state.cc.ac = ((state.memory[(state.h<<8) | (state.l)] & 0x0f) + 1) > 0x0f;
 			state.memory[(state.h<<8) | (state.l)]++;
 			state.cc.z = ((state.memory[(state.h<<8) | (state.l)] & 0xff) == 0);
 			state.cc.s = ((state.memory[(state.h<<8) | (state.l)] & 0x80) != 0);
 			state.cc.p = Parity(state.memory[(state.h<<8) | (state.l)]);
 			break;
-		case 0x35: 
-			// std::cout << "DCR    M";
+		case 0x35: //DCR    M
+			state.cc.ac = ((state.memory[(state.h<<8) | (state.l)] & 0x0f) + 0x0f) > 0x0f;
+			state.memory[(state.h<<8) | (state.l)]--;
+			state.cc.z = ((state.memory[(state.h<<8) | (state.l)] & 0xff) == 0);
+			state.cc.s = ((state.memory[(state.h<<8) | (state.l)] & 0x80) != 0);
+			state.cc.p = Parity(state.memory[(state.h<<8) | (state.l)]);
 			break;
 		case 0x36: 
 			// std::cout << "MVI    M,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
@@ -323,14 +351,18 @@ void Emulate8080Op(State8080& state) {
 			// std::cout << "DCX    SP";
 			break;
 		case 0x3c: //INR    A
-			state.cc.ac = ((state.a & 0x0f) + 1) & 0x10;
+			state.cc.ac = ((state.a & 0x0f) + 1) > 0x0f;
 			state.a++;
 			state.cc.z = ((state.a & 0xff) == 0);
 			state.cc.s = ((state.a & 0x80) != 0);
 			state.cc.p = Parity(state.a);
 			break;
-		case 0x3d: 
-			// std::cout << "DCR    A";
+		case 0x3d: //DCR    A
+			state.cc.ac = ((state.a & 0x0f) + 0x0f) > 0x0f;
+			state.a--;
+			state.cc.z = ((state.a & 0xff) == 0);
+			state.cc.s = ((state.a & 0x80) != 0);
+			state.cc.p = Parity(state.a);
 			break;
 		case 0x3e: 
 			// std::cout << "MVI    A,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];

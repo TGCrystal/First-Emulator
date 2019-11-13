@@ -70,28 +70,28 @@ void ret(State8080& state, bool condition) {
 
 void ana(State8080& state, uint8_t num) {
 	state.a = state.a & num;
-	state.cc.z = ((answer & 0xff) == 0);
-	state.cc.s = ((answer & 0x80) != 0);
+	state.cc.z = ((state.a & 0xff) == 0);
+	state.cc.s = ((state.a & 0x80) != 0);
 	state.cc.cy = 0;
-	state.cc.p = Parity(answer);
+	state.cc.p = Parity(state.a);
 	state.cc.ac = 0;
 }
 
 void xra(State8080& state, uint8_t num) {
 	state.a = state.a ^ num;
-	state.cc.z = ((answer & 0xff) == 0);
-	state.cc.s = ((answer & 0x80) != 0);
+	state.cc.z = ((state.a & 0xff) == 0);
+	state.cc.s = ((state.a & 0x80) != 0);
 	state.cc.cy = 0;
-	state.cc.p = Parity(answer);
+	state.cc.p = Parity(state.a);
 	state.cc.ac = 0;
 }
 
 void ora(State8080& state, uint8_t num) {
 	state.a = state.a | num;
-	state.cc.z = ((answer & 0xff) == 0);
-	state.cc.s = ((answer & 0x80) != 0);
+	state.cc.z = ((state.a & 0xff) == 0);
+	state.cc.s = ((state.a & 0x80) != 0);
 	state.cc.cy = 0;
-	state.cc.p = Parity(answer);
+	state.cc.p = Parity(state.a);
 	state.cc.ac = 0;
 }
 
@@ -107,6 +107,8 @@ void cmp(State8080& state, uint8_t num) {
 
 void Emulate8080Op(State8080& state) {
 	unsigned char* opcode = &state.memory[state.pc];
+	uint8_t temp8;
+	uint16_t temp16;
 	switch(*opcode) {
 		case 0x00: //NOP
 			break;
@@ -115,14 +117,17 @@ void Emulate8080Op(State8080& state) {
 			state.b = opcode[2];
 			state.pc += 2;
 			break;
-		case 0x02: 
-			// std::cout << "STAX   B";
+		case 0x02: //STAX   B
+			state.memory[(state.b<<8) | (state.c)] = state.a;
 			break;
-		case 0x03: 
-			// std::cout << "INX    B";
+		case 0x03: //INX    B
+			temp16 = (state.b<<8) | (state.c);
+			temp16++;
+			state.b = temp16>>8;
+			state.c = temp16&0x0f;
 			break;
-		case 0x04: 
-			// std::cout << "INR    B";
+		case 0x04: //INR    B
+			
 			break;
 		case 0x05: 
 			// std::cout << "DCR    B";
@@ -133,14 +138,13 @@ void Emulate8080Op(State8080& state) {
 		case 0x07:
 			// std::cout << "RLC";
 			break;
-		case 0x08: 
-			// std::cout << "NOP";
+		case 0x08: //NOP
 			break;
 		case 0x09: 
 			// std::cout << "DAD    B";
 			break;
-		case 0x0a: 
-			// std::cout << "LDAX   B";
+		case 0x0a: //LDAX   B
+			state.a = state.memory[(state.b<<8) | (state.c)];
 			break;
 		case 0x0b: 
 			// std::cout << "DCX    B";
@@ -163,8 +167,8 @@ void Emulate8080Op(State8080& state) {
 		case 0x11:
 			// std::cout << "LXI    D,#$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
 			break;
-		case 0x12: 
-			// std::cout << "STAX   D";
+		case 0x12:  //STAX   D
+			state.memory[(state.d<<8) | (state.e)] = state.a;
 			break;
 		case 0x13: 
 			// std::cout << "INX    D";
@@ -187,8 +191,8 @@ void Emulate8080Op(State8080& state) {
 		case 0x19: 
 			// std::cout << "DAD    D";
 			break;
-		case 0x1a: 
-			// std::cout << "LDAX   D";
+		case 0x1a:  //LDAX   D
+			state.a = state.memory[(state.d<<8) | (state.e)];
 			break;
 		case 0x1b: 
 			// std::cout << "DCX    D";
@@ -710,7 +714,7 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xc6: //ADI
 			add(state, opcode[1], 0);
-			state++;
+			state.pc++;
 			break;
 		case 0xc7:
 			// std::cout << "RST    0";
@@ -813,9 +817,12 @@ void Emulate8080Op(State8080& state) {
 				state.pc += 2;
 			break;
 		case 0xe3: //XTHL
-			uint8_t tmp = state.l;
-			state.l = memory[state.sp];
-			memory[state.sp] = state.l;
+			temp8 = state.l;
+			state.l = state.memory[state.sp];
+			state.memory[state.sp] = temp8;
+			temp8 = state.h;
+			state.h = state.memory[state.sp+1];
+			state.memory[state.sp+1] = temp8;
 			break;
 		case 0xe4: //CPO
 			call(state, opcode, !state.cc.p);

@@ -1076,20 +1076,77 @@ void Emulate8080Op(State8080& state) {
 			rst(state, 7);
 			break;
 	}
-	state.pc += 1;
+	state.pc++;
 }
 
-void printTest(uint8_t test) {
-	std::cout << std::bitset<16>((uint16_t) test) << std::endl;
+void printState(State8080& state) {
+	std::cout << "pc,sp: " << std::hex << state.pc << "," << state.sp << "\n";
+	std::cout << "a,b,c,d,e,h,l,: " << std::hex << +state.a << "," << +state.b << "," << +state.c << ","
+												<< +state.d << "," << +state.e << "," << +state.h << ","
+												<< +state.l << "\n";
+	std::cout << "z,s,p,cy,ac: " << +state.cc.z << "," << +state.cc.s << "," << +state.cc.p << ","
+								<< +state.cc.cy << "," << +state.cc.ac << std::endl;
+}
+
+void emulatorDriver(std::string fileName) {
+	std::ifstream input;
+	input.open(fileName);
+	if(!input) {
+		std::cerr << "File " << fileName << " not found" << std::endl;
+		exit(1);
+	}
+
+	std::vector<unsigned char> codebuffer;
+
+	std::string tmp;
+	bool firstChar = true;
+	while(input >> tmp) {
+		for(unsigned int i = 0; i < tmp.size(); i++) {
+			//tempchar takes care of 0 in ascii != 0 in hex
+			unsigned char tempchar = tmp[i];
+			if(tempchar < 58) tempchar -= 48;
+			else tempchar -= 87;
+
+			if(firstChar) {
+				codebuffer.push_back(tempchar);
+				firstChar = false;
+			}
+			else {
+				codebuffer[codebuffer.size()-1] = codebuffer[codebuffer.size()-1] << 4;
+				codebuffer[codebuffer.size()-1] += tempchar;
+				firstChar = true;
+			}
+		}
+	}
+
+	State8080 state;
+	unsigned int fileSize = codebuffer.size();
+	state.memory = new uint8_t[fileSize];
+
+	for(unsigned int i; i < codebuffer.size(); i++) {
+		state.memory[i] = codebuffer[i];
+	}
+
+	state.pc = 0;
+	state.sp = 0x2000;
+	state.a = 0;
+	state.b = 0;
+	state.c = 0;
+	state.d = 0;
+	state.e = 0;
+	state.h = 0;
+	state.l = 0;
+	printState(state);
+	while(true) {
+		std::cin >> tmp;
+		Emulate8080Op(state);
+		printState(state);
+	}
 }
 
 int main(int argc, char* argv[]) {
 
-	uint8_t test = 0x99;
-	printTest(test);
-	printTest(~(test+1));
-	printTest(~(test+1) + 1);
-	printTest(test);
+	emulatorDriver("invaders");
 
 	return 0;
 

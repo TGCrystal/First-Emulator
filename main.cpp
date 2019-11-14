@@ -121,8 +121,8 @@ void Emulate8080Op(State8080& state) {
 		case 0x00: //NOP
 			break;
 		case 0x01: //LXI    B,word
-			state.c = opcode[1];
-			state.b = opcode[2];
+			state.c = opcode[2];
+			state.b = opcode[1];
 			state.pc += 2;
 			break;
 		case 0x02: //STAX   B
@@ -194,8 +194,8 @@ void Emulate8080Op(State8080& state) {
 		case 0x10: //NOP
 			break;
 		case 0x11: //LXI    D,word
-			state.e = opcode[1];
-			state.d = opcode[2];
+			state.e = opcode[2];
+			state.d = opcode[1];
 			state.pc += 2;
 			break;
 		case 0x12:  //STAX   D
@@ -270,12 +270,15 @@ void Emulate8080Op(State8080& state) {
 			// std::cout << "RIM";
 			break;
 		case 0x21: //LXI    H,word
-			state.l = opcode[1];
-			state.h = opcode[2];
+			state.l = opcode[2];
+			state.h = opcode[1];
 			state.pc += 2;
 			break;
-		case 0x22:
-			// std::cout << "SHLD   $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0x22: //SHLD
+			temp16 = (opcode[2]<<8) | opcode[1];
+			state.memory[temp16] = state.l;
+			state.memory[temp16+1] = state.h;
+			state.pc += 2;
 			break;
 		case 0x23: //INX    H
 			temp16 = (state.h<<8) | (state.l);
@@ -309,8 +312,10 @@ void Emulate8080Op(State8080& state) {
 		case 0x29: //DAD    H
 			dad(state, (state.h<<8)|state.l);
 			break;
-		case 0x2a: 
-			// std::cout << "LHLD   $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0x2a: //LHLD
+			temp16 = (opcode[2]<<8) | opcode[1];
+			state.l = state.memory[temp16];
+			state.h = state.memory[temp16+1];
 			break;
 		case 0x2b: //DCX    H
 			temp16 = (state.h<<8) | state.l;

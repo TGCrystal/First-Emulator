@@ -113,6 +113,13 @@ void dad(State8080& state, uint16_t num) {
 	state.l = tmp & 0xff;
 }
 
+void rst(State8080& state, uint8_t num) {
+	state.sp--;
+	state.memory[state.sp] = (state.pc&0xff);
+	state.sp--;
+	state.memory[state.sp] = (state.pc>>4);
+}
+
 void Emulate8080Op(State8080& state) {
 	unsigned char* opcode = &state.memory[state.pc];
 	uint8_t temp8;
@@ -835,8 +842,8 @@ void Emulate8080Op(State8080& state) {
 			add(state, opcode[1], 0);
 			state.pc++;
 			break;
-		case 0xc7:
-			// std::cout << "RST    0";
+		case 0xc7: //RST    0
+			rst(state, 0);
 			break;
 		case 0xc8: //RZ
 			ret(state, state.cc.z);
@@ -861,8 +868,8 @@ void Emulate8080Op(State8080& state) {
 		case 0xce: //ACI
 			add(state, opcode[1], state.cc.cy);
 			break;
-		case 0xcf:
-			// std::cout << "RST    1";
+		case 0xcf: //RST    1
+			rst(state, 1);
 			break;
 		case 0xd0: //RNC
 			ret(state, !state.cc.cy);
@@ -893,8 +900,8 @@ void Emulate8080Op(State8080& state) {
 			add(state, ~opcode[1] + 1, 0);
 			state.pc++;
 			break;
-		case 0xd7:
-			// std::cout << "RST    2";
+		case 0xd7: //RST    2
+			rst(state, 2);
 			break;
 		case 0xd8: //RC
 			ret(state, state.cc.cy);
@@ -918,8 +925,8 @@ void Emulate8080Op(State8080& state) {
 		case 0xde: //SBI
 			add(state, ~(opcode[1]+1) + 1, 0);
 			break;
-		case 0xdf:
-			// std::cout << "RST    3";
+		case 0xdf: //RST    3
+			rst(state, 3);
 			break;
 		case 0xe0: //RPO
 			ret(state, !state.cc.p);
@@ -954,8 +961,8 @@ void Emulate8080Op(State8080& state) {
 		case 0xe6:
 			// std::cout << "ANI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
 			break;
-		case 0xe7:
-			// std::cout << "RST    4";
+		case 0xe7: //RST    4
+			rst(state, 4);
 			break;
 		case 0xe8: //RPE
 			ret(state, state.cc.p);
@@ -980,8 +987,8 @@ void Emulate8080Op(State8080& state) {
 		case 0xee:
 			// std::cout << "XRI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
 			break;
-		case 0xef:
-			// std::cout << "RST    5";
+		case 0xef: //RST    5
+			rst(state, 5);
 			break;
 		case 0xf0: //RP
 			ret(state, !state.cc.s);
@@ -1019,8 +1026,8 @@ void Emulate8080Op(State8080& state) {
 		case 0xf6:
 			// std::cout << "ORI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
 			break;
-		case 0xf7:
-			// std::cout << "RST    6";
+		case 0xf7: //RST    6
+			rst(state, 6);
 			break;
 		case 0xf8: //RM
 			ret(state, state.cc.s);
@@ -1046,8 +1053,8 @@ void Emulate8080Op(State8080& state) {
 			cmp(state, opcode[1]);
 			state.pc++;
 			break;
-		case 0xff:
-			// std::cout << "RST    7";
+		case 0xff: //RST    7
+			rst(state, 7);
 			break;
 	}
 	state.pc += 1;

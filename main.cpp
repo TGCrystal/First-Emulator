@@ -273,8 +273,7 @@ void Emulate8080Op(State8080& state) {
 			state.cc.cy = state.a & 0x01;
 			state.a = (state.a<<1) | (temp8<<7);
 			break;
-		case 0x20: //unknown
-			// std::cout << "RIM";
+		case 0x20: //NOP
 			break;
 		case 0x21: //LXI    H,word
 			state.l = opcode[2];
@@ -885,7 +884,7 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xd3: //OUT
+		case 0xd3: //OUT UNKNOWN
 			state.pc++;
 			break;
 		case 0xd4: //CNC
@@ -914,7 +913,7 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xdb: //IN
+		case 0xdb: //IN UNKNOWN
 			state.pc++;
 			break;
 		case 0xdc: //CC
@@ -958,8 +957,13 @@ void Emulate8080Op(State8080& state) {
             state.memory[state.sp-2] = state.l;    
             state.sp -= 2;
 			break;
-		case 0xe6:
-			// std::cout << "ANI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0xe6: //ANI
+			state.a = state.a & opcode[1];
+			state.cc.cy = 0;
+			state.cc.z = ((state.a & 0xff) == 0);
+			state.cc.s = ((state.a & 0x80) != 0);
+			state.cc.p = Parity(state.a & 0xff);
+			state.pc++;
 			break;
 		case 0xe7: //RST    4
 			rst(state, 4);
@@ -976,16 +980,26 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xeb:
-			// std::cout << "XCHG";
+		case 0xeb: //XCHG
+			temp8 = state.d;
+			state.d = state.h;
+			state.h = temp8;
+			temp8 = state.e;
+			state.e = state.l;
+			state.l = temp8;
 			break;
 		case 0xec: //CPE
 			call(state, opcode, state.cc.p);
 			break;
 		case 0xed: //NOP
 			break;
-		case 0xee:
-			// std::cout << "XRI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0xee: //XRI
+			state.a = state.a ^ opcode[1];
+			state.cc.cy = 0;
+			state.cc.z = ((state.a & 0xff) == 0);
+			state.cc.s = ((state.a & 0x80) != 0);
+			state.cc.p = Parity(state.a & 0xff);
+			state.pc++;
 			break;
 		case 0xef: //RST    5
 			rst(state, 5);
@@ -1023,8 +1037,13 @@ void Emulate8080Op(State8080& state) {
                             state.cc.ac << 4 );
             state.sp -= 2;
 			break;
-		case 0xf6:
-			// std::cout << "ORI    #$" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+1];
+		case 0xf6: //ORI
+			state.a = state.a | opcode[1];
+			state.cc.cy = 0;
+			state.cc.z = ((state.a & 0xff) == 0);
+			state.cc.s = ((state.a & 0x80) != 0);
+			state.cc.p = Parity(state.a & 0xff);
+			state.pc++;
 			break;
 		case 0xf7: //RST    6
 			rst(state, 6);

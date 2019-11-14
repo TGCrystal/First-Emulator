@@ -311,7 +311,7 @@ void Emulate8080Op(State8080& state) {
 				state.a += 6;
 			}
 			if((state.a>>4) > 9) {
-				temp8 = state.a>>4 + 1;
+				temp8 = (state.a>>4) + 1;
 				state.cc.cy = (temp8 > 0xf);
 				state.a = (state.a&0xf) | (temp8<<4);
 			}
@@ -352,8 +352,8 @@ void Emulate8080Op(State8080& state) {
 			state.l = opcode[1];
 			state.pc++;
 			break;
-		case 0x2f:
-			// std::cout << "CMA";
+		case 0x2f: //CMA
+			state.a = ~state.a;
 			break;
 		case 0x30: //NOP
 			break;
@@ -361,8 +361,9 @@ void Emulate8080Op(State8080& state) {
 			state.sp = (opcode[2]<<8) | opcode[1];
 			state.pc += 2;
 			break;
-		case 0x32:
-			// std::cout << "STA    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0x32: //STA
+			state.memory[opcode[2]<<8 | opcode[1]] = state.a;
+			state.pc += 2;
 			break;
 		case 0x33:  //INX    SP
 			state.sp++;
@@ -393,8 +394,9 @@ void Emulate8080Op(State8080& state) {
 		case 0x39: //DAD    SP
 			dad(state, state.sp);
 			break;
-		case 0x3a: 
-			// std::cout << "LDA    $" << std::setw(2) << std::setfill('0') << std::hex << +codebuffer[pc+2] << std::setw(2) << std::setfill('0') << +codebuffer[pc+1];
+		case 0x3a: //LDA
+			state.a = state.memory[opcode[2]<<8 | opcode[1]];
+			state.pc += 2;
 			break;
 		case 0x3b: //DCX    SP
 			state.sp--;

@@ -304,8 +304,20 @@ void Emulate8080Op(State8080& state) {
 			state.h = opcode[1];
 			state.pc++;
 			break;
-		case 0x27:
-			// std::cout << "DAA";
+		case 0x27: //DAA
+			if(state.cc.ac || ((state.a & 0xf) > 9)) {
+				temp8 = (state.a & 0xf) + 1;
+				state.cc.ac = (temp8 > 0xf);
+				state.a += 6;
+			}
+			if((state.a>>4) > 9) {
+				temp8 = state.a>>4 + 1;
+				state.cc.cy = (temp8 > 0xf);
+				state.a = (state.a&0xf) | (temp8<<4);
+			}
+			state.cc.z = ((state.a & 0xff) == 0);
+			state.cc.s = ((state.a & 0x80) != 0);
+			state.cc.p = Parity(state.a);
 			break;
 		case 0x28: //NOP
 			break;

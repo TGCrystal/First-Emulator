@@ -1081,11 +1081,16 @@ void Emulate8080Op(State8080& state) {
 
 void printState(State8080& state) {
 	std::cout << "pc,sp: " << std::hex << std::setw(4) << std::setfill('0') << +state.pc << "," << +state.sp << "\n";
-	std::cout << "a,b,c,d,e,h,l,: " << std::hex << +state.a << "," << +state.b << "," << +state.c << ","
-												<< +state.d << "," << +state.e << "," << +state.h << ","
-												<< +state.l << "\n";
+	std::cout << "a\tb c\td e\th l\n";
+	std::cout << std::setw(2) << std::setfill('0') << +state.a << "\t";
+	std::cout << std::setw(2) << std::setfill('0') << +state.b;
+	std::cout << std::setw(2) << std::setfill('0') << +state.c << "\t";
+	std::cout << std::setw(2) << std::setfill('0') << +state.d;
+	std::cout << std::setw(2) << std::setfill('0') << +state.e << "\t";
+	std::cout << std::setw(2) << std::setfill('0') << +state.h;
+	std::cout << std::setw(2) << std::setfill('0') << +state.l << "\n";
 	std::cout << "z,s,p,cy,ac: " << +state.cc.z << "," << +state.cc.s << "," << +state.cc.p << ","
-								<< +state.cc.cy << "," << +state.cc.ac << std::endl;
+								<< +state.cc.cy << "," << +state.cc.ac << "\n" << std::endl;
 }
 
 void emulatorDriver(std::string fileName) {
@@ -1146,7 +1151,7 @@ void emulatorDriver(std::string fileName) {
 
 int main(int argc, char* argv[]) {
 
-	emulatorDriver("invaders");
+	emulatorDriver("BalloonBomber");
 
 	return 0;
 

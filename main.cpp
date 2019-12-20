@@ -128,8 +128,8 @@ void Emulate8080Op(State8080& state) {
 		case 0x00: //NOP
 			break;
 		case 0x01: //LXI    B,word
-			state.c = opcode[2];
-			state.b = opcode[1];
+			state.c = opcode[1];
+			state.b = opcode[2];
 			state.pc += 2;
 			break;
 		case 0x02: //STAX   B
@@ -201,8 +201,8 @@ void Emulate8080Op(State8080& state) {
 		case 0x10: //NOP
 			break;
 		case 0x11: //LXI    D,word
-			state.e = opcode[2];
-			state.d = opcode[1];
+			state.e = opcode[1];
+			state.d = opcode[2];
 			state.pc += 2;
 			break;
 		case 0x12:  //STAX   D
@@ -276,8 +276,8 @@ void Emulate8080Op(State8080& state) {
 		case 0x20: //NOP
 			break;
 		case 0x21: //LXI    H,word
-			state.l = opcode[2];
-			state.h = opcode[1];
+			state.l = opcode[1];
+			state.h = opcode[2];
 			state.pc += 2;
 			break;
 		case 0x22: //SHLD
@@ -1080,7 +1080,7 @@ void Emulate8080Op(State8080& state) {
 }
 
 void printState(State8080& state) {
-	std::cout << "pc,sp: " << std::hex << state.pc << "," << state.sp << "\n";
+	std::cout << "pc,sp: " << std::hex << std::setw(4) << std::setfill('0') << +state.pc << "," << +state.sp << "\n";
 	std::cout << "a,b,c,d,e,h,l,: " << std::hex << +state.a << "," << +state.b << "," << +state.c << ","
 												<< +state.d << "," << +state.e << "," << +state.h << ","
 												<< +state.l << "\n";

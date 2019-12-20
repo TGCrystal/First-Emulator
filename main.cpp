@@ -53,7 +53,7 @@ void call(State8080& state, unsigned char* opcode, bool condition) {
 		state.memory[state.sp-1] = (ret >> 8) & 0xff;
 		state.memory[state.sp-2] = (ret & 0xff);
 		state.sp -= 2;
-		state.pc = (opcode[2] << 8) | opcode[1];
+		state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 	}
 	else
 		state.pc += 2;
@@ -61,7 +61,7 @@ void call(State8080& state, unsigned char* opcode, bool condition) {
 
 void ret(State8080& state, bool condition) {
 	if(condition) {
-		state.pc = state.memory[state.sp] | (state.memory[state.sp+1] << 8);
+		state.pc = (state.memory[state.sp] | (state.memory[state.sp+1] << 8)) - 1;
 		state.sp += 2;
 	}
 	else
@@ -822,12 +822,12 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xc2: //JNZ
 			if(!state.cc.z)
-				state.pc = (opcode[2] << 8) | opcode[1];
+				state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 			else
 				state.pc += 2;
 			break;
 		case 0xc3: //JMP
-			state.pc = (opcode[2] << 8) | opcode[1];
+			state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 			break;
 		case 0xc4: //CNZ
 			call(state, opcode, !state.cc.z);
@@ -852,7 +852,7 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xca: //JZ
 			if(state.cc.z)
-				state.pc = (opcode[2] << 8) | opcode[1];
+				state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 			else
 				state.pc += 2;
 			break;
@@ -880,7 +880,7 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xd2: //JNC
 			if(!state.cc.cy)
-				state.pc = (opcode[2] << 8) | opcode[1];
+				state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 			else
 				state.pc += 2;
 			break;
@@ -909,7 +909,7 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xda: //JC
 			if(state.cc.cy)
-				state.pc = (opcode[2] << 8) | opcode[1];
+				state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 			else
 				state.pc += 2;
 			break;
@@ -937,7 +937,7 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xe2: //JPO
 			if(!state.cc.p)
-				state.pc = (opcode[2] << 8) | opcode[1];
+				state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 			else
 				state.pc += 2;
 			break;
@@ -972,11 +972,11 @@ void Emulate8080Op(State8080& state) {
 			ret(state, state.cc.p);
 			break;
 		case 0xe9: //PCHL
-			state.pc = (state.h<<8) | (state.l);
+			state.pc = ((state.h<<8) | (state.l)) - 1;
 			break;
 		case 0xea: //JPE
 			if(state.cc.p)
-				state.pc = (opcode[2] << 8) | opcode[1];
+				state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 			else
 				state.pc += 2;
 			break;
@@ -1018,7 +1018,7 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xf2: //JP
 			if(!state.cc.s)
-				state.pc = (opcode[2] << 8) | opcode[1];
+				state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 			else
 				state.pc += 2;
 			break;
@@ -1056,7 +1056,7 @@ void Emulate8080Op(State8080& state) {
 			break;
 		case 0xfa: //JM
 			if(state.cc.s)
-				state.pc = (opcode[2] << 8) | opcode[1];
+				state.pc = ((opcode[2] << 8) | opcode[1]) - 1;
 			else
 				state.pc += 2;
 			break;

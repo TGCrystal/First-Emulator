@@ -21,7 +21,20 @@ struct State8080 {
 	uint8_t* memory;
 	struct ConditionCodes cc;
 	uint8_t int_enable;
+
+	uint8_t shift0,shift1,shift_offset;
 };
+
+unit8_t MachineIN(State8080& state, uint8_t port) {
+	uint8_t a = 0;
+	uint16_t temp16;
+	switch(port) {
+		case 3:
+			temp16 = (shift1<<8) || shift0;
+			a = ((temp16 >> (8 - shift_offset)) & 0xff);
+	}
+	return a;
+}
 
 void UnimplementedInstruction(State8080& state) {
 	std::cerr << "Error: Unimplemented Instruction" << std::endl;
@@ -884,7 +897,7 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xd3: //OUT UNKNOWN
+		case 0xd3: //OUT
 			state.pc++;
 			break;
 		case 0xd4: //CNC
@@ -913,8 +926,9 @@ void Emulate8080Op(State8080& state) {
 			else
 				state.pc += 2;
 			break;
-		case 0xdb: //IN UNKNOWN
-			state.pc++;
+		case 0xdb: //IN
+    	    state.a = MachineIN(state, opcode[1]);
+    	    state.pc++;
 			break;
 		case 0xdc: //CC
 			call(state, opcode, state.cc.cy);
@@ -1143,15 +1157,28 @@ void emulatorDriver(std::string fileName) {
 	state.l = 0;
 	printState(state);
 	while(true) {
-		std::cin >> tmp;
-		Emulate8080Op(state);
-		printState(state);
+		// unsigned char* opcode = &state.memory[state.pc];
+
+  //   	if (*opcode == 0xdb) //IN
+  //   	{    
+  //   	    uint8_t port = opcode[1];    
+  //   	    state.a = MachineIN(state, port);    
+  //   	    state.pc++;    
+  //   	}    
+  //   	else if (*opcode == 0xd3)  //OUT    
+  //   	{    
+  //   	    uint8_t port = opcode[1];    
+  //   	    MachineOUT(state, port);    
+  //   	    state.pc++;    
+  //   	}    
+  //   	else    
+    	    Emulate8080Op(state); 
 	}
 }
 
 int main(int argc, char* argv[]) {
 
-	emulatorDriver("BalloonBomber");
+	emulatorDriver("Invaders");
 
 	return 0;
 

@@ -1142,7 +1142,7 @@ void emulatorDriver(std::string fileName) {
 	unsigned int fileSize = codebuffer.size();
 	state.memory = new uint8_t[fileSize];
 
-	for(unsigned int i; i < codebuffer.size(); i++) {
+	for(unsigned int i = 0; i < fileSize; i++) {
 		state.memory[i] = codebuffer[i];
 	}
 

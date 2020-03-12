@@ -5,6 +5,21 @@
 
 #include "machineState.h"
 
+bool isascii(const std::string& fileName) {
+	//Thanks to https://stackoverflow.com/questions/277521/how-to-identify-the-file-content-as-ascii-or-binary
+	std::ifstream input;
+	input.open(fileName, std::ios::in);
+	if(!input) {
+		std::cerr << "File " << fileName << " not found" << std::endl;
+		exit(1);
+	}
+	int i;
+	while((i = input.get()) != EOF && i <= 127) {}
+	input.clear();
+	input.close();
+	return i == EOF;
+}
+
 int Parity(int num) {
 	uint8_t answer = 0;
 	while(num != 0) {
@@ -17,32 +32,70 @@ int Parity(int num) {
 MachineState::MachineState(const std::string& fileName) {
 
 	std::ifstream input;
-	input.open(fileName);
-	if(!input) {
-		std::cerr << "File " << fileName << " not found" << std::endl;
-		exit(1);
-	}
-	std::string tmp;
-	bool firstChar = true;
-	while(input >> tmp) {
-		for(unsigned int i = 0; i < tmp.size(); i++) {
-			//tempchar takes care of 0 in ascii != 0 in hex
-			unsigned char tempchar = tmp[i];
-			if(tempchar <= '9' && tempchar >= '0') tempchar -= 48;
-			else if(tempchar <= 'f' && tempchar >= 'a') tempchar -= 87;
 
-			if(firstChar) {
-				this->memory.push_back(tempchar);
-				firstChar = false;
-			}
-			else {
-				this->memory[this->memory.size()-1] = this->memory[this->memory.size()-1] << 4;
-				this->memory[this->memory.size()-1] += tempchar;
-				firstChar = true;
+	if(isascii(fileName)) {
+		input.open(fileName, std::ios::in);
+		std::string tmp;
+		bool firstChar = true;
+		while(input >> tmp) {
+			for(unsigned int i = 0; i < tmp.size(); i++) {
+				//tempchar takes care of 0 in ascii != 0 in hex
+				uint8_t tempchar = tmp[i];
+				if(tempchar < 58) tempchar -= 48;
+				else tempchar -= 87;
+
+				if(firstChar) {
+					memory.push_back(tempchar);
+					firstChar = false;
+				}
+				else {
+					memory[memory.size()-1] = memory[memory.size()-1] << 4;
+					memory[memory.size()-1] += tempchar;
+					firstChar = true;
+				}
 			}
 		}
 	}
+	else {
+		input.open(fileName, std::ios::in | std::ios::binary | std::ios::ate);
+		unsigned char tmp;
+		bool firstChar = true;
+		std::streampos size = input.tellg();
+		char* mem = new char[size];
+    	input.seekg (0, std::ios::beg);
+    	input.read (mem, size);
+		while(((tmp = input.get()) != EOF)) {
+			// for(unsigned int i = 0; i < tmp.size(); i++) {
+			// 	//tempchar takes care of 0 in ascii != 0 in hex
+			// 	uint8_t tempchar = tmp[i];
+			// 	if(tempchar < 58) tempchar -= 48;
+			// 	else tempchar -= 87;
+
+			// 	if(firstChar) {
+			// 		memory.push_back(tempchar);
+			// 		firstChar = false;
+			// 	}
+			// 	else {
+			// 		memory[memory.size()-1] = memory[memory.size()-1] << 4;
+			// 		memory[memory.size()-1] += tempchar;
+			// 		firstChar = true;
+			// 	}
+			// }
+			std::cout << std::hex << (int) firstChar << std::endl;
+		}
+		delete [] mem;
+	}
 	input.close();
+
+	unsigned int fileSize = memory.size();
+
+	for(unsigned int i = 0; i < fileSize; i++) {
+		std::cout << std::hex << (int)this->memory[i] << " ";
+		if(i%5 == 4)
+			std::cout << "\n";
+	}
+	std::cout << std::endl;
+
 
 	//establish initial values
 	this->pc = 0;

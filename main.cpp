@@ -9,9 +9,9 @@ int main(int argc, char* argv[]) {
 
 	MachineState state(fileName);
 
-	while(!state.isDone()) {
-		state.processCommand();
-	}
+	// while(!state.isDone()) {
+	// 	state.processCommand();
+	// }
 
 	return 0;
 

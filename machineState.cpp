@@ -34,6 +34,7 @@ MachineState::MachineState(const std::string& fileName) {
 	std::ifstream input;
 
 	if(isascii(fileName)) {
+		std::vector<unsigned char> asciiConverter;
 		input.open(fileName, std::ios::in);
 		std::string tmp;
 		bool firstChar = true;
@@ -45,51 +46,36 @@ MachineState::MachineState(const std::string& fileName) {
 				else tempchar -= 87;
 
 				if(firstChar) {
-					memory.push_back(tempchar);
+					asciiConverter.push_back(tempchar);
 					firstChar = false;
 				}
 				else {
-					memory[memory.size()-1] = memory[memory.size()-1] << 4;
-					memory[memory.size()-1] += tempchar;
+					asciiConverter[asciiConverter.size()-1] = asciiConverter[asciiConverter.size()-1] << 4;
+					asciiConverter[asciiConverter.size()-1] += tempchar;
 					firstChar = true;
 				}
 			}
 		}
+		memorySize = asciiConverter.size();
+		memory = new unsigned char[memorySize];
+		for(unsigned int i = 0; i < memorySize; i++) {
+			memory[i] = asciiConverter[i];
+		}
 	}
 	else {
 		input.open(fileName, std::ios::in | std::ios::binary | std::ios::ate);
-		unsigned char tmp;
-		bool firstChar = true;
-		std::streampos size = input.tellg();
-		char* mem = new char[size];
+		memorySize = input.tellg();
     	input.seekg (0, std::ios::beg);
-    	input.read (mem, size);
-		while(((tmp = input.get()) != EOF)) {
-			// for(unsigned int i = 0; i < tmp.size(); i++) {
-			// 	//tempchar takes care of 0 in ascii != 0 in hex
-			// 	uint8_t tempchar = tmp[i];
-			// 	if(tempchar < 58) tempchar -= 48;
-			// 	else tempchar -= 87;
-
-			// 	if(firstChar) {
-			// 		memory.push_back(tempchar);
-			// 		firstChar = false;
-			// 	}
-			// 	else {
-			// 		memory[memory.size()-1] = memory[memory.size()-1] << 4;
-			// 		memory[memory.size()-1] += tempchar;
-			// 		firstChar = true;
-			// 	}
-			// }
-			std::cout << std::hex << (int) firstChar << std::endl;
-		}
-		delete [] mem;
+		char* memorySigned = new char[memorySize];
+		memory = new unsigned char[memorySize];
+    	input.read (memorySigned, memorySize);
+    	for(unsigned int i = 0; i < memorySize; i++) {
+    		memory[i] = (unsigned char) memorySigned[i];
+    	} 
 	}
 	input.close();
 
-	unsigned int fileSize = memory.size();
-
-	for(unsigned int i = 0; i < fileSize; i++) {
+	for(unsigned int i = 0; i < memorySize; i++) {
 		std::cout << std::hex << (int)this->memory[i] << " ";
 		if(i%5 == 4)
 			std::cout << "\n";
@@ -108,6 +94,10 @@ MachineState::MachineState(const std::string& fileName) {
 	this->h = 0;
 	this->l = 0;
 	cc.set();
+}
+
+MachineState::~MachineState() {
+	delete[] memory;
 }
 
 void MachineState::printState() const {

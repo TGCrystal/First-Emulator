@@ -7,9 +7,10 @@
 class MachineState {
 public:
 	MachineState(const std::string& fileName);
+	~MachineState();
 
 	void printState() const;
-	bool isDone() const { return pc >= memory.size(); }
+	bool isDone() const { return pc >= memorySize; }
 
 	void processCommand();
 
@@ -17,7 +18,8 @@ private:
 	//Reigsters and other data to store
 	uint8_t a, b, c, d, e, h, l;
 	uint16_t sp, pc;
-	std::vector<uint8_t> memory;
+	unsigned char* memory;
+	uint16_t memorySize;
 	uint8_t int_enable;
 	uint8_t shift0, shift1, shift_offset;
 	/*Condition Code reference

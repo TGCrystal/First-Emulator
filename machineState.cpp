@@ -71,21 +71,22 @@ MachineState::MachineState(const std::string& fileName) {
     	input.read (memorySigned, memorySize);
     	for(unsigned int i = 0; i < memorySize; i++) {
     		memory[i] = (unsigned char) memorySigned[i];
-    	} 
+    	}
+
+    	if(fileName == "cpudiag.bin") {
+    		this->memory[0]= 0xc3;
+    		this->memory[1]= 0;
+    		this->memory[2]= 0x01;
+    		this->memory[368] = 0x7;
+    	}
+
+    	delete[] memorySigned;
 	}
 	input.close();
 
-	for(unsigned int i = 0; i < memorySize; i++) {
-		std::cout << std::hex << (int)this->memory[i] << " ";
-		if(i%5 == 4)
-			std::cout << "\n";
-	}
-	std::cout << std::endl;
-
-
 	//establish initial values
 	this->pc = 0;
-	this->sp = 0x2000;
+	this->sp = 0;
 	this->a = 0;
 	this->b = 0;
 	this->c = 0;
@@ -855,27 +856,27 @@ void MachineState::processCommand() {
 			call(this->cc[0]);
 			break;
 		case 0xcd: //CALL
-			// if (5 ==  ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]))    
-   //          {    
-   //              if (this->c == 9)    
-   //              {    
-   //                  uint16_t offset = (this->d<<8) | (this->e);    
-   //                  char *str = (char*) &this->memory[offset+3];  //skip the prefix bytes    
-   //                  while (*str != '$')    
-   //                      printf("%c", *str++);    
-   //                  printf("\n");    
-   //              }    
-   //              else if (this->c == 2)    
-   //              {    
-   //                  //saw this in the inspected code, never saw it called    
-   //                  printf ("print char routine called\n");    
-   //              }    
-   //          }    
-   //          else if (0 ==  ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]))    
-   //          {    
-   //              exit(0);    
-   //          }    
-   //          else    
+			if (5 ==  ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]))    
+            {    
+                if (this->c == 9)    
+                {    
+                    uint16_t offset = (this->d<<8) | (this->e);    
+                    char *str = (char*) &this->memory[offset+3];  //skip the prefix bytes    
+                    while (*str != '$')    
+                        printf("%c", *str++);    
+                    printf("\n");    
+                }    
+                else if (this->c == 2)    
+                {    
+                    //saw this in the inspected code, never saw it called    
+                    printf ("print char routine called\n");    
+                }    
+            }    
+            else if (0 ==  ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]))    
+            {    
+                exit(0);    
+            }    
+            else    
 				call(true);
 			break;
 		case 0xce: //ACI

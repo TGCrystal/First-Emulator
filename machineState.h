@@ -10,6 +10,7 @@ public:
 	~MachineState();
 
 	void printState() const;
+	void printDisassembled() const;
 	bool isDone() const { return pc >= memorySize; }
 
 	void processCommand();
@@ -41,6 +42,8 @@ private:
 	void cmp(uint8_t num);
 	void dad(uint16_t num);
 	void rst(uint8_t num);
+
+	int getOpcode(uint16_t index) const;
 };
 
 #endif

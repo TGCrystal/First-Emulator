@@ -1,0 +1,816 @@
+0000 JMP    $0100
+0003 MOV    C,L
+0004 MOV    C,C
+0005 MOV    B,E
+0006 MOV    D,D
+0007 MOV    C,A
+0008 MOV    B,E
+0009 MOV    C,A
+000a MOV    D,E
+000b MOV    C,L
+000c RIM
+000d MOV    B,C
+000e MOV    D,E
+000f MOV    D,E
+0010 MOV    C,A
+0011 MOV    B,E
+0012 MOV    C,C
+0013 MOV    B,C
+0014 MOV    D,H
+0015 MOV    B,L
+0016 MOV    D,E
+0017 RIM
+0018 NOP
+0019 NOP
+001a NOP
+001b NOP
+001c CMA
+001d NOP
+001e NOP
+001f NOP
+0020 DCR    M
+0021 RIM
+0022 MOV    B,E
+0023 MOV    D,B
+0024 MOV    D,L
+0025 RIM
+0026 MOV    B,H
+0027 MOV    C,C
+0028 MOV    B,C
+0029 MOV    B,A
+002a MOV    C,M
+002b MOV    C,A
+002c MOV    D,E
+002d MOV    D,H
+002e MOV    C,C
+002f MOV    B,E
+0030 RIM
+0031 MOV    D,M
+0032 MOV    B,L
+0033 MOV    D,D
+0034 MOV    D,E
+0035 MOV    C,C
+0036 MOV    C,A
+0037 MOV    C,M
+0038 RIM
+0039 LXI    SP,#$302e
+003c RIM
+003d NOP
+003e MOV    B,E
+003f DAD    H
+0040 RIM
+0041 LXI    SP,#$3839
+0044 NOP
+0045 PUSH   D
+0046 XCHG
+0047 MVI    C,#$09
+0049 CALL   $0005
+004c POP    D
+004d RET
+004e MVI    C,#$02
+0050 CALL   $0005
+0053 RET
+0054 PUSH   PSW
+0055 CALL   $0164
+0058 MOV    E,A
+0059 CALL   $014e
+005c POP    PSW
+005d CALL   $0168
+0060 MOV    E,A
+0061 JMP    $014e
+0064 RRC
+0065 RRC
+0066 RRC
+0067 RRC
+0068 ANI    #$0f
+006a CPI    #$0a
+006c JM     $0171
+006f ADI    #$07
+0071 ADI    #$30
+0073 RET
+0074 INR    C
+0075 DCR    C
+0076 LDAX   B
+0077 RIM
+0078 MOV    B,E
+0079 MOV    D,B
+007a MOV    D,L
+007b RIM
+007c MOV    C,C
+007d MOV    D,E
+007e RIM
+007f MOV    C,A
+0080 MOV    D,B
+0081 MOV    B,L
+0082 MOV    D,D
+0083 MOV    B,C
+0084 MOV    D,H
+0085 MOV    C,C
+0086 MOV    C,A
+0087 MOV    C,M
+0088 MOV    B,C
+0089 MOV    C,H
+008a INR    H
+008b INR    C
+008c DCR    C
+008d LDAX   B
+008e RIM
+008f MOV    B,E
+0090 MOV    D,B
+0091 MOV    D,L
+0092 RIM
+0093 MOV    C,B
+0094 MOV    B,C
+0095 MOV    D,E
+0096 RIM
+0097 MOV    B,M
+0098 MOV    B,C
+0099 MOV    C,C
+009a MOV    C,H
+009b MOV    B,L
+009c MOV    B,H
+009d LXI    H,#$4520
+00a0 MOV    D,D
+00a1 MOV    D,D
+00a2 MOV    C,A
+00a3 MOV    D,D
+00a4 RIM
+00a5 MOV    B,L
+00a6 MOV    E,B
+00a7 MOV    C,C
+00a8 MOV    D,H
+00a9 DCR    A
+00aa INR    H
+00ab LXI    SP,#$07ad
+00ae ANI    #$00
+00b0 JZ     $01b6
+00b3 CALL   $0689
+00b6 JNC    $01bc
+00b9 CALL   $0689
+00bc JPE    $01c2
+00bf CALL   $0689
+00c2 JP     $01c8
+00c5 CALL   $0689
+00c8 JNZ    $01d7
+00cb JC     $01d7
+00ce JPO    $01d7
+00d1 JM     $01d7
+00d4 JMP    $01da
+00d7 CALL   $0689
+00da ADI    #$06
+00dc JNZ    $01e2
+00df CALL   $0689
+00e2 JC     $01eb
+00e5 JPO    $01eb
+00e8 JP     $01ee
+00eb CALL   $0689
+00ee ADI    #$70
+00f0 JPO    $01f6
+00f3 CALL   $0689
+00f6 JM     $01ff
+00f9 JZ     $01ff
+00fc JNC    $0202
+00ff CALL   $0689
+0102 ADI    #$81
+0104 JM     $020a
+0107 CALL   $0689
+010a JZ     $0213
+010d JC     $0213
+0110 JPO    $0216
+0113 CALL   $0689
+0116 ADI    #$fe
+0118 JC     $021e
+011b CALL   $0689
+011e JZ     $0227
+0121 JPO    $0227
+0124 JM     $022a
+0127 CALL   $0689
+012a CPI    #$00
+012c JC     $0242
+012f JZ     $0242
+0132 CPI    #$f5
+0134 JC     $0242
+0137 JNZ    $0242
+013a CPI    #$ff
+013c JZ     $0242
+013f JC     $0245
+0142 CALL   $0689
+0145 ACI    0a
+0147 ACI    0a
+0149 CPI    #$0b
+014b JZ     $0251
+014e CALL   $0689
+0151 SUI    #$0c
+0153 SUI    #$0f
+0155 CPI    #$f0
+0157 JZ     $025d
+015a CALL   $0689
+015d SBI    #$f1
+015f SBI    #$0e
+0161 CPI    #$f0
+0163 JZ     $0269
+0166 CALL   $0689
+0169 ANI    #$55
+016b CPI    #$50
+016d JZ     $0273
+0170 RLC
+0171 ADC    C
+0172 MVI    B,#$f6
+0174 LDA    $7afe
+0177 JZ     $027d
+017a CALL   $0689
+017d XRI    #$0f
+017f CPI    #$75
+0181 JZ     $0287
+0184 CALL   $0689
+0187 ANI    #$00
+0189 CC     $0689
+018c CPO    $0689
+018f CM     $0689
+0192 CNZ    $0689
+0195 CPI    #$00
+0197 JZ     $029d
+019a CALL   $0689
+019d SUI    #$77
+019f CNC    $0689
+01a2 CPE    $0689
+01a5 CP     $0689
+01a8 CZ     $0689
+01ab CPI    #$89
+01ad JZ     $02b3
+01b0 CALL   $0689
+01b3 ANI    #$ff
+01b5 CPO    $02c0
+01b8 CPI    #$d9
+01ba JZ     $031d
+01bd CALL   $0689
+01c0 RPE
+01c1 ADI    #$10
+01c3 CPE    $02cc
+01c6 ADI    #$02
+01c8 RPO
+01c9 CALL   $0689
+01cc RPO
+01cd ADI    #$20
+01cf CM     $02d8
+01d2 ADI    #$04
+01d4 RPE
+01d5 CALL   $0689
+01d8 RP
+01d9 ADI    #$80
+01db CP     $02e4
+01de ADI    #$80
+01e0 RM
+01e1 CALL   $0689
+01e4 RM
+01e5 ADI    #$40
+01e7 CNC    $02f0
+01ea ADI    #$40
+01ec RP
+01ed CALL   $0689
+01f0 RC
+01f1 ADI    #$8f
+01f3 CC     $02fc
+01f6 SUI    #$02
+01f8 RNC
+01f9 CALL   $0689
+01fc RNC
+01fd ADI    #$f7
+01ff CNZ    $0308
+0202 ADI    #$fe
+0204 RC
+0205 CALL   $0689
+0208 RZ
+0209 ADI    #$01
+020b CZ     $0314
+020e ADI    #$d0
+0210 RNZ
+0211 CALL   $0689
+0214 RNZ
+0215 ADI    #$47
+0217 CPI    #$47
+0219 RZ
+021a CALL   $0689
+021d MVI    A,#$77
+021f INR    A
+0220 MOV    B,A
+0221 INR    B
+0222 MOV    C,B
+0223 DCR    C
+0224 MOV    D,C
+0225 MOV    E,D
+0226 MOV    H,E
+0227 MOV    L,H
+0228 MOV    A,L
+0229 DCR    A
+022a MOV    C,A
+022b MOV    E,C
+022c MOV    L,E
+022d MOV    B,L
+022e MOV    D,B
+022f MOV    H,D
+0230 MOV    A,H
+0231 MOV    D,A
+0232 INR    D
+0233 MOV    L,D
+0234 MOV    C,L
+0235 INR    C
+0236 MOV    H,C
+0237 MOV    B,H
+0238 DCR    B
+0239 MOV    E,B
+023a MOV    A,E
+023b MOV    E,A
+023c INR    E
+023d MOV    B,E
+023e MOV    H,B
+023f INR    H
+0240 MOV    C,H
+0241 MOV    L,C
+0242 MOV    D,L
+0243 DCR    D
+0244 MOV    A,D
+0245 MOV    H,A
+0246 DCR    H
+0247 MOV    D,H
+0248 MOV    B,D
+0249 MOV    L,B
+024a INR    L
+024b MOV    E,L
+024c DCR    E
+024d MOV    C,E
+024e MOV    A,C
+024f MOV    L,A
+0250 DCR    L
+0251 MOV    H,L
+0252 MOV    E,H
+0253 MOV    D,E
+0254 MOV    C,D
+0255 MOV    B,C
+0256 MOV    A,B
+0257 CPI    #$77
+0259 CNZ    $0689
+025c XRA    A
+025d MVI    B,#$01
+025f MVI    C,#$03
+0261 MVI    D,#$07
+0263 MVI    E,#$0f
+0265 MVI    H,#$1f
+0267 MVI    L,#$3f
+0269 ADD    B
+026a ADD    C
+026b ADD    D
+026c ADD    E
+026d ADD    H
+026e ADD    L
+026f ADD    A
+0270 CPI    #$f0
+0272 CNZ    $0689
+0275 SUB    B
+0276 SUB    C
+0277 SUB    D
+0278 SUB    E
+0279 SUB    H
+027a SUB    L
+027b CPI    #$78
+027d CNZ    $0689
+0280 SUB    A
+0281 CNZ    $0689
+0284 MVI    A,#$80
+0286 ADD    A
+0287 MVI    B,#$01
+0289 MVI    C,#$02
+028b MVI    D,#$03
+028d MVI    E,#$04
+028f MVI    H,#$05
+0291 MVI    L,#$06
+0293 ADC    B
+0294 MVI    B,#$80
+0296 ADD    B
+0297 ADD    B
+0298 ADC    C
+0299 ADD    B
+029a ADD    B
+029b ADC    D
+029c ADD    B
+029d ADD    B
+029e ADC    E
+029f ADD    B
+02a0 ADD    B
+02a1 ADC    H
+02a2 ADD    B
+02a3 ADD    B
+02a4 ADC    L
+02a5 ADD    B
+02a6 ADD    B
+02a7 ADC    A
+02a8 CPI    #$37
+02aa CNZ    $0689
+02ad MVI    A,#$80
+02af ADD    A
+02b0 MVI    B,#$01
+02b2 SBB    B
+02b3 MVI    B,#$ff
+02b5 ADD    B
+02b6 SBB    C
+02b7 ADD    B
+02b8 SBB    D
+02b9 ADD    B
+02ba SBB    E
+02bb ADD    B
+02bc SBB    H
+02bd ADD    B
+02be SBB    L
+02bf CPI    #$e0
+02c1 CNZ    $0689
+02c4 MVI    A,#$80
+02c6 ADD    A
+02c7 SBB    A
+02c8 CPI    #$ff
+02ca CNZ    $0689
+02cd MVI    A,#$ff
+02cf MVI    B,#$fe
+02d1 MVI    C,#$fc
+02d3 MVI    D,#$ef
+02d5 MVI    E,#$7f
+02d7 MVI    H,#$f4
+02d9 MVI    L,#$bf
+02db ANA    A
+02dc ANA    C
+02dd ANA    D
+02de ANA    E
+02df ANA    H
+02e0 ANA    L
+02e1 ANA    A
+02e2 CPI    #$24
+02e4 CNZ    $0689
+02e7 XRA    A
+02e8 MVI    B,#$01
+02ea MVI    C,#$02
+02ec MVI    D,#$04
+02ee MVI    E,#$08
+02f0 MVI    H,#$10
+02f2 MVI    L,#$20
+02f4 ORA    B
+02f5 ORA    C
+02f6 ORA    D
+02f7 ORA    E
+02f8 ORA    H
+02f9 ORA    L
+02fa ORA    A
+02fb CPI    #$3f
+02fd CNZ    $0689
+0300 MVI    A,#$00
+0302 MVI    H,#$8f
+0304 MVI    L,#$4f
+0306 XRA    B
+0307 XRA    C
+0308 XRA    D
+0309 XRA    E
+030a XRA    H
+030b XRA    L
+030c CPI    #$cf
+030e CNZ    $0689
+0311 XRA    A
+0312 CNZ    $0689
+0315 MVI    B,#$44
+0317 MVI    C,#$45
+0319 MVI    D,#$46
+031b MVI    E,#$47
+031d MVI    H,#$06
+031f MVI    L,#$a6
+0321 MOV    M,B
+0322 MVI    B,#$00
+0324 MOV    B,M
+0325 MVI    A,#$44
+0327 CMP    B
+0328 CNZ    $0689
+032b MOV    M,D
+032c MVI    D,#$00
+032e MOV    D,M
+032f MVI    A,#$46
+0331 CMP    D
+0332 CNZ    $0689
+0335 MOV    M,E
+0336 MVI    E,#$00
+0338 MOV    E,M
+0339 MVI    A,#$47
+033b CMP    E
+033c CNZ    $0689
+033f MOV    M,H
+0340 MVI    H,#$06
+0342 MVI    L,#$a6
+0344 MOV    H,M
+0345 MVI    A,#$06
+0347 CMP    H
+0348 CNZ    $0689
+034b MOV    M,L
+034c MVI    H,#$06
+034e MVI    L,#$a6
+0350 MOV    L,M
+0351 MVI    A,#$a6
+0353 CMP    L
+0354 CNZ    $0689
+0357 MVI    H,#$06
+0359 MVI    L,#$a6
+035b MVI    A,#$32
+035d MOV    M,A
+035e CMP    M
+035f CNZ    $0689
+0362 ADD    M
+0363 CPI    #$64
+0365 CNZ    $0689
+0368 XRA    A
+0369 MOV    A,M
+036a CPI    #$32
+036c CNZ    $0689
+036f MVI    H,#$06
+0371 MVI    L,#$a6
+0373 MOV    A,M
+0374 SUB    M
+0375 CNZ    $0689
+0378 MVI    A,#$80
+037a ADD    A
+037b ADC    M
+037c CPI    #$33
+037e CNZ    $0689
+0381 MVI    A,#$80
+0383 ADD    A
+0384 SBB    M
+0385 CPI    #$cd
+0387 CNZ    $0689
+038a ANA    M
+038b CNZ    $0689
+038e MVI    A,#$25
+0390 ORA    M
+0391 CPI    #$37
+0393 CNZ    $0689
+0396 XRA    M
+0397 CPI    #$05
+0399 CNZ    $0689
+039c MVI    M,#$55
+039e INR    M
+039f DCR    M
+03a0 ADD    M
+03a1 CPI    #$5a
+03a3 CNZ    $0689
+03a6 LXI    B,#$12ff
+03a9 LXI    D,#$12ff
+03ac LXI    H,#$12ff
+03af INX    B
+03b0 INX    D
+03b1 INX    H
+03b2 MVI    A,#$13
+03b4 CMP    B
+03b5 CNZ    $0689
+03b8 CMP    D
+03b9 CNZ    $0689
+03bc CMP    H
+03bd CNZ    $0689
+03c0 MVI    A,#$00
+03c2 CMP    C
+03c3 CNZ    $0689
+03c6 CMP    E
+03c7 CNZ    $0689
+03ca CMP    L
+03cb CNZ    $0689
+03ce DCX    B
+03cf DCX    D
+03d0 DCX    H
+03d1 MVI    A,#$12
+03d3 CMP    B
+03d4 CNZ    $0689
+03d7 CMP    D
+03d8 CNZ    $0689
+03db CMP    H
+03dc CNZ    $0689
+03df MVI    A,#$ff
+03e1 CMP    C
+03e2 CNZ    $0689
+03e5 CMP    E
+03e6 CNZ    $0689
+03e9 CMP    L
+03ea CNZ    $0689
+03ed STA    $06a6
+03f0 XRA    A
+03f1 LDA    $06a6
+03f4 CPI    #$ff
+03f6 CNZ    $0689
+03f9 LHLD   $06a4
+03fc SHLD   $06a6
+03ff LDA    $06a4
+0402 MOV    B,A
+0403 LDA    $06a6
+0406 CMP    B
+0407 CNZ    $0689
+040a LDA    $06a5
+040d MOV    B,A
+040e LDA    $06a7
+0411 CMP    B
+0412 CNZ    $0689
+0415 MVI    A,#$aa
+0417 STA    $06a6
+041a MOV    B,H
+041b MOV    C,L
+041c XRA    A
+041d LDAX   B
+041e CPI    #$aa
+0420 CNZ    $0689
+0423 INR    A
+0424 STAX   B
+0425 LDA    $06a6
+0428 CPI    #$ab
+042a CNZ    $0689
+042d MVI    A,#$77
+042f STA    $06a6
+0432 LHLD   $06a4
+0435 LXI    D,#$0000
+0438 XCHG
+0439 XRA    A
+043a LDAX   D
+043b CPI    #$77
+043d CNZ    $0689
+0440 XRA    A
+0441 ADD    H
+0442 ADD    L
+0443 CNZ    $0689
+0446 MVI    A,#$cc
+0448 STAX   D
+0449 LDA    $06a6
+044c CPI    #$cc
+044e STAX   D
+044f LDA    $06a6
+0452 CPI    #$cc
+0454 CNZ    $0689
+0457 LXI    H,#$7777
+045a DAD    H
+045b MVI    A,#$ee
+045d CMP    H
+045e CNZ    $0689
+0461 CMP    L
+0462 CNZ    $0689
+0465 LXI    H,#$5555
+0468 LXI    B,#$ffff
+046b DAD    B
+046c MVI    A,#$55
+046e CNC    $0689
+0471 CMP    H
+0472 CNZ    $0689
+0475 MVI    A,#$54
+0477 CMP    L
+0478 CNZ    $0689
+047b LXI    H,#$aaaa
+047e LXI    D,#$3333
+0481 DAD    D
+0482 MVI    A,#$dd
+0484 CMP    H
+0485 CNZ    $0689
+0488 CMP    L
+0489 CNZ    $0689
+048c STC
+048d CNC    $0689
+0490 CMC
+0491 CC     $0689
+0494 MVI    A,#$aa
+0496 CMA
+0497 CPI    #$55
+0499 CNZ    $0689
+049c ORA    A
+049d DAA
+049e CPI    #$55
+04a0 CNZ    $0689
+04a3 MVI    A,#$88
+04a5 ADD    A
+04a6 DAA
+04a7 CPI    #$76
+04a9 CNZ    $0689
+04ac XRA    A
+04ad MVI    A,#$aa
+04af DAA
+04b0 CNC    $0689
+04b3 CPI    #$10
+04b5 CNZ    $0689
+04b8 XRA    A
+04b9 MVI    A,#$9a
+04bb DAA
+04bc CNC    $0689
+04bf CNZ    $0689
+04c2 STC
+04c3 MVI    A,#$42
+04c5 RLC
+04c6 CC     $0689
+04c9 RLC
+04ca CNC    $0689
+04cd CPI    #$09
+04cf CNZ    $0689
+04d2 RRC
+04d3 CNC    $0689
+04d6 RRC
+04d7 CPI    #$42
+04d9 CNZ    $0689
+04dc RAL
+04dd RAL
+04de CNC    $0689
+04e1 CPI    #$08
+04e3 CNZ    $0689
+04e6 RAR
+04e7 RAR
+04e8 CC     $0689
+04eb CPI    #$02
+04ed CNZ    $0689
+04f0 LXI    B,#$1234
+04f3 LXI    D,#$aaaa
+04f6 LXI    H,#$5555
+04f9 XRA    A
+04fa PUSH   B
+04fb PUSH   D
+04fc PUSH   H
+04fd PUSH   PSW
+04fe LXI    B,#$0000
+0501 LXI    D,#$0000
+0504 LXI    H,#$0000
+0507 MVI    A,#$c0
+0509 ADI    #$f0
+050b POP    PSW
+050c POP    H
+050d POP    D
+050e POP    B
+050f CC     $0689
+0512 CNZ    $0689
+0515 CPO    $0689
+0518 CM     $0689
+051b MVI    A,#$12
+051d CMP    B
+051e CNZ    $0689
+0521 MVI    A,#$34
+0523 CMP    C
+0524 CNZ    $0689
+0527 MVI    A,#$aa
+0529 CMP    D
+052a CNZ    $0689
+052d CMP    E
+052e CNZ    $0689
+0531 MVI    A,#$55
+0533 CMP    H
+0534 CNZ    $0689
+0537 CMP    L
+0538 CNZ    $0689
+053b LXI    H,#$0000
+053e DAD    SP
+053f SHLD   $06ab
+0542 LXI    SP,#$06aa
+0545 DCX    SP
+0546 DCX    SP
+0547 INX    SP
+0548 DCX    SP
+0549 MVI    A,#$55
+054b STA    $06a8
+054e CMA
+054f STA    $06a9
+0552 POP    B
+0553 CMP    B
+0554 CNZ    $0689
+0557 CMA
+0558 CMP    C
+0559 CNZ    $0689
+055c LXI    H,#$06aa
+055f SPHL
+0560 LXI    H,#$7733
+0563 DCX    SP
+0564 DCX    SP
+0565 XTHL
+0566 LDA    $06a9
+0569 CPI    #$77
+056b CNZ    $0689
+056e LDA    $06a8
+0571 CPI    #$33
+0573 CNZ    $0689
+0576 MVI    A,#$55
+0578 CMP    L
+0579 CNZ    $0689
+057c CMA
+057d CMP    H
+057e CNZ    $0689
+0581 LHLD   $06ab
+0584 SPHL
+0585 LXI    H,#$069b
+0588 PCHL
+0589 LXI    H,#$018b
+058c CALL   $0145
+058f XTHL
+0590 MOV    A,H
+0591 CALL   $0154
+0594 MOV    A,L
+0595 CALL   $0154
+0598 JMP    $0000
+059b LXI    H,#$0174
+059e CALL   $0145
+05a1 JMP    $0000
+05a4 ANA    M
+05a5 MVI    B,#$00
+05a7 NOP
+05a8 NOP
+05a9 NOP
+05aa NOP
+05ab NOP
+05ac NOP

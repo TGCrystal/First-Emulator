@@ -112,7 +112,10 @@ void MachineState::printState() const {
 	std::cout << std::setw(2) << std::setfill('0') << +this->h;
 	std::cout << std::setw(2) << std::setfill('0') << +this->l << "\n";
 	std::cout << "z,s,p,cy,ac: " << +this->cc[0] << "," << +this->cc[1] << "," << +this->cc[2] << ","
-								<< +this->cc[3] << "," << +this->cc[4] << "\n" << std::endl;
+								<< +this->cc[3] << "," << +this->cc[4] << "\n";
+	std::cout << "Next Instruction: ";
+	this->getOpcode(this->pc);
+	std::cout << std::endl;
 }
 
 void MachineState::printDisassembled() const {

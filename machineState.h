@@ -44,6 +44,7 @@ private:
 	void rst(uint8_t num);
 
 	int getOpcode(uint16_t index) const;
+	int getOpcodeDescription(uint16_t index) const;
 };
 
 #endif

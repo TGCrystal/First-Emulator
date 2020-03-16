@@ -21,8 +21,13 @@ int main(int argc, char* argv[]) {
 	else {
 		while(!state.isDone()) {
 			state.printState();
-			while (std::cin.get() != '\n');
-			state.processCommand();
+			std::string input;
+			int numCommands = 1;
+			std::getline(std::cin, input);
+			if(input.length() > 0 && input[0] >= '0' && input[0] <= '9')
+				numCommands = std::stoi(input);
+			for(int i = 0; i < numCommands; i++)
+				state.processCommand();
 		}
 	}
 

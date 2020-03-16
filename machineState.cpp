@@ -1032,7 +1032,7 @@ int MachineState::getOpcode(uint16_t index) const {
 		case 0x1f:
 			std::cout << "RAR"; break;
 		case 0x20:
-			std::cout << "RIM"; break;
+			std::cout << "NOP"; break;
 		case 0x21:
 			std::cout << "LXI    H,#$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
 			opBytes = 3; break;
@@ -1531,8 +1531,6 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 	std::cout << std::hex << std::setw(4) << std::setfill('0') << index << " ";
 	switch(code)
 	{
-		case 0x00: //NOP
-			std::cout << "Do nothing"; break;
 		case 0x01: //LXI B
 			std::cout << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2];
 			std::cout << " moved into B, ";
@@ -1553,8 +1551,6 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 			opBytes = 2; break;
 		case 0x07: //RLC
 			std::cout << "A<<1, shifted off bit placed onto other end"; break;
-		case 0x08: //NOP
-			std::cout << "Do nothing"; break;
 		case 0x09: //DAD B
 			std::cout << "HL += BC"; break;
 		case 0x0a: //LDAX B
@@ -1572,8 +1568,6 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 			opBytes = 2; break;
 		case 0x0f: //RRC
 			std::cout << "A>>1, shifted off bit placed onto other end"; break;
-		case 0x10: //NOP
-			std::cout << "Do nothing"; break;
 		case 0x11: //LXI D
 			std::cout << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2];
 			std::cout << " moved into D, ";
@@ -1594,8 +1588,6 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 			opBytes = 2; break;
 		case 0x17: //RAL
 			std::cout << "A<<1, shifted off bit placed into carry, carry placed into other end"; break;
-		case 0x18: //NOP
-			std::cout << "Do nothing"; break;
 		case 0x19: //DAD D
 			std::cout << "HL += DE"; break;
 		case 0x1a: //LDAX D
@@ -1613,493 +1605,208 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 			opBytes = 2; break;
 		case 0x1f: //RAR
 			std::cout << "A>>1, shifted off bit placed into carry, carry placed into other end"; break;
-		case 0x20:
-			std::cout << "RIM"; break;
-		case 0x21:
-			std::cout << "LXI    H,#$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0x21: //LXI H
+			std::cout << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2];
+			std::cout << " moved into H, ";
+			std::cout << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+			std::cout << " moved into L";
 			opBytes = 3; break;
-		case 0x22:
-			std::cout << "SHLD   $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0x22: //SHLD
+			std::cout << "memory[(byte3)(byte2)] = L, memory[(byte3)(byte2)+1] = H";
 			opBytes = 3; break;
-		case 0x23: 
-			std::cout << "INX    H"; break;
-		case 0x24: 
-			std::cout << "INR    H"; break;
-		case 0x25: 
-			std::cout << "DCR    H"; break;
-		case 0x26: 
-			std::cout << "MVI    H,#$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+		case 0x23: //INX H
+			std::cout << "HL++"; break;
+		case 0x24: //INR H
+			std::cout << "H++"; break;
+		case 0x25: //DRC H
+			std::cout << "H--"; break;
+		case 0x26: //MVI H
+			std::cout << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+			std::cout << " moved into D";
 			opBytes = 2; break;
-		case 0x27:
-			std::cout << "DAA"; break;
-		case 0x28: 
-			std::cout << "NOP"; break;
-		case 0x29: 
-			std::cout << "DAD    H"; break;
-		case 0x2a: 
-			std::cout << "LHLD   $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0x27: //DAA
+			std::cout << "Decimal Adjust Accumulator (check manual for details)"; break;
+		case 0x29: //DAD H
+			std::cout << "HL += HL"; break;
+		case 0x2a: //LHLD
+			std::cout << "L = memory[(byte3)(byte2)], H = memory[(byte3)(byte2)+1]";
 			opBytes = 3; break;
-		case 0x2b: 
-			std::cout << "DCX    H"; break;
-		case 0x2c: 
-			std::cout << "INR    L"; break;
-		case 0x2d: 
-			std::cout << "DCR    L"; break;
-		case 0x2e: 
-			std::cout << "MVI    L,#$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+		case 0x2b: //DCX H
+			std::cout << "HL--"; break;
+		case 0x2c: //INR L
+			std::cout << "L++"; break;
+		case 0x2d: //DCR L
+			std::cout << "L--"; break;
+		case 0x2e: //MVI L
+			std::cout << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+			std::cout << " moved into L";
 			opBytes = 2; break;
-		case 0x2f:
-			std::cout << "CMA"; break;
-		case 0x30:
-			std::cout << "NOP"; break;
-		case 0x31:
-			std::cout << "LXI    SP,#$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0x2f: //CMA
+			std::cout << "~A (negate bits of A)"; break;
+		case 0x31: //LXI SP
+			std::cout << "SP = (byte3)(byte2)";
 			opBytes = 3; break;
-		case 0x32:
-			std::cout << "STA    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0x32: //STA
+			std::cout << "memory[(byte3)(byte2)] = A";
 			opBytes = 3; break;
-		case 0x33: 
-			std::cout << "INX    SP"; break;
-		case 0x34: 
-			std::cout << "INR    M"; break;
-		case 0x35: 
-			std::cout << "DCR    M"; break;
-		case 0x36: 
-			std::cout << "MVI    M,#$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+		case 0x33: //INX SP
+			std::cout << "SP++"; break;
+		case 0x34: //INR M
+			std::cout << "memory[HL]++"; break;
+		case 0x35: //DCR M
+			std::cout << "memory[HL]--"; break;
+		case 0x36: //MVI M
+			std::cout << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+			std::cout << " moved into memory[HL]";
 			opBytes = 2; break;
-		case 0x37:
-			std::cout << "STC"; break;
-		case 0x38: 
-			std::cout << "NOP"; break;
-		case 0x39: 
-			std::cout << "DAD    SP"; break;
-		case 0x3a: 
-			std::cout << "LDA    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0x37: //STC
+			std::cout << "Carry flag = 1"; break;
+		case 0x39: //DAD SP
+			std::cout << "HL += SP"; break;
+		case 0x3a: //LDA
+			std::cout << "A = memory[HL]";
 			opBytes = 3; break;
-		case 0x3b: 
-			std::cout << "DCX    SP"; break;
-		case 0x3c: 
-			std::cout << "INR    A"; break;
-		case 0x3d: 
-			std::cout << "DCR    A"; break;
-		case 0x3e: 
-			std::cout << "MVI    A,#$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+		case 0x3b: //DCX
+			std::cout << "SP--"; break;
+		case 0x3c: //INR A
+			std::cout << "A++"; break;
+		case 0x3d: //DCR A
+			std::cout << "A--"; break;
+		case 0x3e: //MVI
+			std::cout << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+			std::cout << " moved into A";
 			opBytes = 2; break;
-		case 0x3f:
-			std::cout << "CMC"; break;
-		case 0x40:
-			std::cout << "MOV    B,B"; break;
-		case 0x41:
-			std::cout << "MOV    B,C"; break;
-		case 0x42:
-			std::cout << "MOV    B,D"; break;
-		case 0x43:
-			std::cout << "MOV    B,E"; break;
-		case 0x44:
-			std::cout << "MOV    B,H"; break;
-		case 0x45:
-			std::cout << "MOV    B,L"; break;
-		case 0x46:
-			std::cout << "MOV    B,M"; break;
-		case 0x47:
-			std::cout << "MOV    B,A"; break;
-		case 0x48:
-			std::cout << "MOV    C,B"; break;
-		case 0x49:
-			std::cout << "MOV    C,C"; break;
-		case 0x4a:
-			std::cout << "MOV    C,D"; break;
-		case 0x4b:
-			std::cout << "MOV    C,E"; break;
-		case 0x4c:
-			std::cout << "MOV    C,H"; break;
-		case 0x4d:
-			std::cout << "MOV    C,L"; break;
-		case 0x4e:
-			std::cout << "MOV    C,M"; break;
-		case 0x4f:
-			std::cout << "MOV    C,A"; break;
-		case 0x50:
-			std::cout << "MOV    D,B"; break;
-		case 0x51:
-			std::cout << "MOV    D,C"; break;
-		case 0x52:
-			std::cout << "MOV    D,D"; break;
-		case 0x53:
-			std::cout << "MOV    D,E"; break;
-		case 0x54:
-			std::cout << "MOV    D,H"; break;
-		case 0x55:
-			std::cout << "MOV    D,L"; break;
-		case 0x56:
-			std::cout << "MOV    D,M"; break;
-		case 0x57:
-			std::cout << "MOV    D,A"; break;
-		case 0x58:
-			std::cout << "MOV    E,B"; break;
-		case 0x59:
-			std::cout << "MOV    E,C"; break;
-		case 0x5a:
-			std::cout << "MOV    E,D"; break;
-		case 0x5b:
-			std::cout << "MOV    E,E"; break;
-		case 0x5c:
-			std::cout << "MOV    E,H"; break;
-		case 0x5d:
-			std::cout << "MOV    E,L"; break;
-		case 0x5e:
-			std::cout << "MOV    E,M"; break;
-		case 0x5f:
-			std::cout << "MOV    E,A"; break;
-		case 0x60:
-			std::cout << "MOV    H,B"; break;
-		case 0x61:
-			std::cout << "MOV    H,C"; break;
-		case 0x62:
-			std::cout << "MOV    H,D"; break;
-		case 0x63:
-			std::cout << "MOV    H,E"; break;
-		case 0x64:
-			std::cout << "MOV    H,H"; break;
-		case 0x65:
-			std::cout << "MOV    H,L"; break;
-		case 0x66:
-			std::cout << "MOV    H,M"; break;
-		case 0x67:
-			std::cout << "MOV    H,A"; break;
-		case 0x68:
-			std::cout << "MOV    L,B"; break;
-		case 0x69:
-			std::cout << "MOV    L,C"; break;
-		case 0x6a:
-			std::cout << "MOV    L,D"; break;
-		case 0x6b:
-			std::cout << "MOV    L,E"; break;
-		case 0x6c:
-			std::cout << "MOV    L,H"; break;
-		case 0x6d:
-			std::cout << "MOV    L,L"; break;
-		case 0x6e:
-			std::cout << "MOV    L,M"; break;
-		case 0x6f:
-			std::cout << "MOV    L,A"; break;
-		case 0x70:
-			std::cout << "MOV    M,B"; break;
-		case 0x71:
-			std::cout << "MOV    M,C"; break;
-		case 0x72:
-			std::cout << "MOV    M,D"; break;
-		case 0x73:
-			std::cout << "MOV    M,E"; break;
-		case 0x74:
-			std::cout << "MOV    M,H"; break;
-		case 0x75:
-			std::cout << "MOV    M,L"; break;
-		case 0x76:
-			std::cout << "HLT"; break;
-		case 0x77:
-			std::cout << "MOV    M,A"; break;
-		case 0x78:
-			std::cout << "MOV    A,B"; break;
-		case 0x79:
-			std::cout << "MOV    A,C"; break;
-		case 0x7a:
-			std::cout << "MOV    A,D"; break;
-		case 0x7b:
-			std::cout << "MOV    A,E"; break;
-		case 0x7c:
-			std::cout << "MOV    A,H"; break;
-		case 0x7d:
-			std::cout << "MOV    A,L"; break;
-		case 0x7e:
-			std::cout << "MOV    A,M"; break;
-		case 0x7f:
-			std::cout << "MOV    A,A"; break;
-		case 0x80:
-			std::cout << "ADD    B"; break;
-		case 0x81:
-			std::cout << "ADD    C"; break;
-		case 0x82:
-			std::cout << "ADD    D"; break;
-		case 0x83:
-			std::cout << "ADD    E"; break;
-		case 0x84:
-			std::cout << "ADD    H"; break;
-		case 0x85:
-			std::cout << "ADD    L"; break;
-		case 0x86:
-			std::cout << "ADD    M"; break;
-		case 0x87:
-			std::cout << "ADD    A"; break;
-		case 0x88:
-			std::cout << "ADC    B"; break;
-		case 0x89:
-			std::cout << "ADC    C"; break;
-		case 0x8a:
-			std::cout << "ADC    D"; break;
-		case 0x8b:
-			std::cout << "ADC    E"; break;
-		case 0x8c:
-			std::cout << "ADC    H"; break;
-		case 0x8d:
-			std::cout << "ADC    L"; break;
-		case 0x8e:
-			std::cout << "ADC    M"; break;
-		case 0x8f:
-			std::cout << "ADC    A"; break;
-		case 0x90:
-			std::cout << "SUB    B"; break;
-		case 0x91:
-			std::cout << "SUB    C"; break;
-		case 0x92:
-			std::cout << "SUB    D"; break;
-		case 0x93:
-			std::cout << "SUB    E"; break;
-		case 0x94:
-			std::cout << "SUB    H"; break;
-		case 0x95:
-			std::cout << "SUB    L"; break;
-		case 0x96:
-			std::cout << "SUB    M"; break;
-		case 0x97:
-			std::cout << "SUB    A"; break;
-		case 0x98:
-			std::cout << "SBB    B"; break;
-		case 0x99:
-			std::cout << "SBB    C"; break;
-		case 0x9a:
-			std::cout << "SBB    D"; break;
-		case 0x9b:
-			std::cout << "SBB    E"; break;
-		case 0x9c:
-			std::cout << "SBB    H"; break;
-		case 0x9d:
-			std::cout << "SBB    L"; break;
-		case 0x9e:
-			std::cout << "SBB    M"; break;
-		case 0x9f:
-			std::cout << "SBB    A"; break;
-		case 0xa0:
-			std::cout << "ANA    B"; break;
-		case 0xa1:
-			std::cout << "ANA    C"; break;
-		case 0xa2:
-			std::cout << "ANA    D"; break;
-		case 0xa3:
-			std::cout << "ANA    E"; break;
-		case 0xa4:
-			std::cout << "ANA    H"; break;
-		case 0xa5:
-			std::cout << "ANA    L"; break;
-		case 0xa6:
-			std::cout << "ANA    M"; break;
-		case 0xa7:
-			std::cout << "ANA    A"; break;
-		case 0xa8:
-			std::cout << "XRA    B"; break;
-		case 0xa9:
-			std::cout << "XRA    C"; break;
-		case 0xaa:
-			std::cout << "XRA    D"; break;
-		case 0xab:
-			std::cout << "XRA    E"; break;
-		case 0xac:
-			std::cout << "XRA    H"; break;
-		case 0xad:
-			std::cout << "XRA    L"; break;
-		case 0xae:
-			std::cout << "XRA    M"; break;
-		case 0xaf:
-			std::cout << "XRA    A"; break;
-		case 0xb0:
-			std::cout << "ORA    B"; break;
-		case 0xb1:
-			std::cout << "ORA    C"; break;
-		case 0xb2:
-			std::cout << "ORA    D"; break;
-		case 0xb3:
-			std::cout << "ORA    E"; break;
-		case 0xb4:
-			std::cout << "ORA    H"; break;
-		case 0xb5:
-			std::cout << "ORA    L"; break;
-		case 0xb6:
-			std::cout << "ORA    M"; break;
-		case 0xb7:
-			std::cout << "ORA    A"; break;
-		case 0xb8:
-			std::cout << "CMP    B"; break;
-		case 0xb9:
-			std::cout << "CMP    C"; break;
-		case 0xba:
-			std::cout << "CMP    D"; break;
-		case 0xbb:
-			std::cout << "CMP    E"; break;
-		case 0xbc:
-			std::cout << "CMP    H"; break;
-		case 0xbd:
-			std::cout << "CMP    L"; break;
-		case 0xbe:
-			std::cout << "CMP    M"; break;
-		case 0xbf:
-			std::cout << "CMP    A"; break;
-		case 0xc0:
-			std::cout << "RNZ"; break;
-		case 0xc1:
-			std::cout << "POP    B"; break;
-		case 0xc2:
-			std::cout << "JNZ    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0x3f: //CMC
+			std::cout << "carry bit *= -1"; break;
+		case 0x76: //HLT
+			std::cout << "PC increments to next insturction, then waits for interrupt"; break;
+		case 0xc0: //RNZ
+			std::cout << "Return if zero bit = 0"; break;
+		case 0xc1: //POP B
+			std::cout << "C = memory[SP], B = memory[SP+1], SP += 2"; break;
+		case 0xc2: //JNZ
+			std::cout << "Jump if zero bit = 0";
 			opBytes = 3; break;
-		case 0xc3:
-			std::cout << "JMP    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0xc3: //JMP
+			std::cout << "Unconditional jump";
 			opBytes = 3; break;
-		case 0xc4:
-			std::cout << "CNZ    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0xc4: //CNZ
+			std::cout << "Call if zero bit = 0";
 			opBytes = 3; break;
-		case 0xc5:
-			std::cout << "PUSH   B"; break;
-		case 0xc6:
-			std::cout << "ADI    #$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+		case 0xc5: //PUSH B
+			std::cout << "memory[SP-1] = B, memory[SP-2] = C, SP -= 2"; break;
+		case 0xc7: //RST 0
+			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 0"; break;
+		case 0xc8: //RZ
+			std::cout << "Return if zero bit = 1"; break;
+		case 0xc9: //RET
+			std::cout << "Unconditional return"; break;
+		case 0xca: //JZ
+			std::cout << "Jump if zero bit = 1";
+			opBytes = 3; break;
+		case 0xcc: //CZ
+			std::cout << "Call if zero bit = 1";
+			opBytes = 3; break;
+		case 0xcd: //CALL
+			std::cout << "Unconditional Call";
+			opBytes = 3; break;
+		case 0xcf: //RST 1
+			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 8"; break;
+		case 0xd0: //RNC
+			std::cout << "Return if carry bit = 0"; break;
+		case 0xd1: //POP D
+			std::cout << "E = memory[SP], D = memory[SP+1], SP += 2"; break;
+		case 0xd2: //JNC
+			std::cout << "Jump if carry bit = 0";
+			opBytes = 3; break;
+		case 0xd4: //CNC
+			std::cout << "Call if carry bit = 0";
+			opBytes = 3; break;
+		case 0xd5: //PUSH D
+			std::cout << "memory[SP-1] = D, memory[SP-2] = E, SP -= 2"; break;
+		case 0xd7: //RST 2
+			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 16"; break;
+		case 0xd8: //RC
+			std::cout << "Return if carry bit = 1"; break;
+		case 0xda: //JC
+			std::cout << "Jump if carry bit = 1";
+			opBytes = 3; break;
+		case 0xdc: //CC
+			std::cout << "Call if carry bit = 1";
+			opBytes = 3; break;
+		case 0xdf: //RST 3
+			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 16"; break;
+		case 0xe0: //RPO
+			std::cout << "Return if parity bit = 0"; break;
+		case 0xe1: //POP H
+			std::cout << "L = memory[SP], H = memory[SP+1], SP += 2"; break;
+		case 0xe2: //JPO
+			std::cout << "Jump if parity bit = 0";
+			opBytes = 3; break;
+		case 0xe3: //XTHL
+			std::cout << "L <-> memory[SP], H <-> memory[SP+1]"; break;
+		case 0xe4: //CPO
+			std::cout << "Call if parity bit = 0";
+			opBytes = 3; break;
+		case 0xe5: //PUSH H
+			std::cout << "memory[SP-1] = H, memory[SP-2] = L, SP -= 2"; break;
+		case 0xe7: //RST 4
+			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 24"; break;
+		case 0xe8: //RPE
+			std::cout << "Return if parity bit = 1"; break;
+		case 0xe9: //PCHL
+			std::cout << "(PC highest 8 bits) = H, (PC lowest 8 bits) = L"; break;
+		case 0xea: //JPE
+			std::cout << "Jump if parity bit = 1";
+			opBytes = 3; break;
+		case 0xeb: //XCHG
+			std::cout << "H <-> D, L <-> E"; break;
+		case 0xec: //CPE
+			std::cout << "Call if parity bit = 1";
+			opBytes = 3; break;
+		case 0xee: //XRI
+			std::cout << "XOR with immediate";
 			opBytes = 2; break;
-		case 0xc7:
-			std::cout << "RST    0"; break;
-		case 0xc8:
-			std::cout << "RZ"; break;
-		case 0xc9:
-			std::cout << "RET"; break;
-		case 0xca:
-			std::cout << "JZ     $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0xef: //RST 4
+			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 32"; break;
+		case 0xf0: //RP
+			std::cout << "Return if sign bit = 0"; break;
+		case 0xf1: //POP PSW
+			std::cout << "Take flag values off of stack"; break;
+		case 0xf2: //JP
+			std::cout << "Jump if sign bit = 0";
 			opBytes = 3; break;
-		case 0xcb:
-			std::cout << "NOP"; break;
-		case 0xcc:
-			std::cout << "CZ     $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0xf3: //DI
+			std::cout << "int_enable = 0"; break;
+		case 0xf4: //CP
+			std::cout << "Call if sign bit = 0";
 			opBytes = 3; break;
-		case 0xcd:
-			std::cout << "CALL   $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xce:
-			std::cout << "ACI    " << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+		case 0xf5: //PUSH PSW
+			std::cout << "Push flags to stack"; break;
+		case 0xf6: //ORI
+			std::cout << "OR immediate";
 			opBytes = 2; break;
-		case 0xcf:
-			std::cout << "RST    1"; break;
-		case 0xd0:
-			std::cout << "RNC"; break;
-		case 0xd1:
-			std::cout << "POP    D"; break;
-		case 0xd2:
-			std::cout << "JNC    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xd3:
-			std::cout << "OUT    #$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
-			opBytes = 2; break;
-		case 0xd4:
-			std::cout << "CNC    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xd5:
-			std::cout << "PUSH   D"; break;
-		case 0xd6:
-			std::cout << "SUI    #$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
-			opBytes = 2; break;
-		case 0xd7:
-			std::cout << "RST    2"; break;
-		case 0xd8:
-			std::cout << "RC"; break;
-		case 0xd9:
-			std::cout << "NOP"; break;
-		case 0xda:
-			std::cout << "JC     $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xdb:
-			std::cout << "IN     #$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
-			opBytes = 2; break;
-		case 0xdc:
-			std::cout << "CC     $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xdd:
-			std::cout << "NOP"; break;
-		case 0xde:
-			std::cout << "SBI    #$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
-			opBytes = 2; break;
-		case 0xdf:
-			std::cout << "RST    3"; break;
-		case 0xe0:
-			std::cout << "RPO"; break;
-		case 0xe1:
-			std::cout << "POP    H"; break;
-		case 0xe2:
-			std::cout << "JPO    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xe3:
-			std::cout << "XTHL"; break;
-		case 0xe4:
-			std::cout << "CPO    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xe5:
-			std::cout << "PUSH   H"; break;
-		case 0xe6:
-			std::cout << "ANI    #$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
-			opBytes = 2; break;
-		case 0xe7:
-			std::cout << "RST    4"; break;
-		case 0xe8:
-			std::cout << "RPE"; break;
-		case 0xe9:
-			std::cout << "PCHL"; break;
-		case 0xea:
-			std::cout << "JPE    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xeb:
-			std::cout << "XCHG"; break;
-		case 0xec:
-			std::cout << "CPE    $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xed:
-			std::cout << "NOP"; break;
-		case 0xee:
-			std::cout << "XRI    #$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
-			opBytes = 2; break;
-		case 0xef:
-			std::cout << "RST    5"; break;
-		case 0xf0:
-			std::cout << "RP"; break;
-		case 0xf1:
-			std::cout << "POP    PSW"; break;
-		case 0xf2:
-			std::cout << "JP     $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xf3:
-			std::cout << "DI"; break;
-		case 0xf4:
-			std::cout << "CP     $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
-			opBytes = 3; break;
-		case 0xf5:
-			std::cout << "PUSH   PSW"; break;
-		case 0xf6:
-			std::cout << "ORI    #$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
-			opBytes = 2; break;
-		case 0xf7:
-			std::cout << "RST    6"; break;
-		case 0xf8:
-			std::cout << "RM"; break;
-		case 0xf9:
+		case 0xf7: //RST 6
+			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 48"; break;
+		case 0xf8: //RM
+			std::cout << "Return if sign bit = 1"; break;
+		case 0xf9: //SPHL
 			std::cout << "SPHL"; break;
-		case 0xfa:
-			std::cout << "JM     $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0xfa: //JM
+			std::cout << "Jump if sign bit = 1";
 			opBytes = 3; break;
-		case 0xfb:
-			std::cout << "EI"; break;
-		case 0xfc:
-			std::cout << "CM     $" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+2] << std::setw(2) << std::setfill('0') << (int) memory[index+1];
+		case 0xfb: //EI
+			std::cout << "int_enable = 1"; break;
+		case 0xfc: //CM
+			std::cout << "Call if sign bit = 1";
 			opBytes = 3; break;
-		case 0xfd:
-			std::cout << "NOP"; break;
-		case 0xfe:
-			std::cout << "CPI    #$" << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
+		case 0xfe: //CPI
+			std::cout << "Compare immediate";
 			opBytes = 2; break;
-		case 0xff:
-			std::cout << "RST    7"; break;
-
+		case 0xff: //RST 7
+			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 56"; break;
+		default:
+			return 1;
 	}
 
 	std::cout << "\n";

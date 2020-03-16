@@ -94,7 +94,6 @@ MachineState::MachineState(const std::string& fileName) {
 	this->e = 0;
 	this->h = 0;
 	this->l = 0;
-	cc.set();
 }
 
 MachineState::~MachineState() {
@@ -636,8 +635,8 @@ void MachineState::processCommand() {
 		case 0xc0: //RNZ
 			ret(!this->cc[0]); break;
 		case 0xc1: //POP    B
-			this->c = this->memory[this->sp];
 			this->b = this->memory[this->sp+1];
+			this->c = this->memory[this->sp];
 			this->sp += 2; break;
 		case 0xc2: //JNZ
 			if(!this->cc[0])
@@ -703,8 +702,8 @@ void MachineState::processCommand() {
 		case 0xd0: //RNC
 			ret(!this->cc[3]); break;
 		case 0xd1: //POP    D
-			this->d = this->memory[this->sp];
-			this->e = this->memory[this->sp+1];
+			this->d = this->memory[this->sp+1];
+			this->e = this->memory[this->sp];
 			this->sp += 2; break;
 		case 0xd2: //JNC
 			if(!this->cc[3])
@@ -749,8 +748,8 @@ void MachineState::processCommand() {
 		case 0xe0: //RPO
 			ret(!this->cc[2]); break;
 		case 0xe1: //POP    H
-			this->h = this->memory[this->sp];
-			this->l = this->memory[this->sp+1];
+			this->h = this->memory[this->sp+1];
+			this->l = this->memory[this->sp];
 			this->sp += 2; break;
 		case 0xe2: //JPO
 			if(!this->cc[2])
@@ -1554,8 +1553,7 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 		case 0x09: //DAD B
 			std::cout << "HL += BC"; break;
 		case 0x0a: //LDAX B
-			std::cout << "A = memory[BC] = ";
-			std::cout << std::setw(2) << std::setfill('0') << (int) this->memory[(this->b<<4) + this->c]; break;
+			std::cout << "A = memory[BC]"; break;
 		case 0x0b: //DCX B
 			std::cout << "BC--"; break;
 		case 0x0c: //INR C
@@ -1577,7 +1575,7 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 		case 0x12: //STAX D
 			std::cout << "Store A in location specified by DE"; break;
 		case 0x13: //INX D
-			std::cout << "DC++"; break;
+			std::cout << "DE++"; break;
 		case 0x14: //INR D
 			std::cout << "D++"; break;
 		case 0x15: //DCR D
@@ -1591,8 +1589,7 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 		case 0x19: //DAD D
 			std::cout << "HL += DE"; break;
 		case 0x1a: //LDAX D
-			std::cout << "A = memory[DE] = ";
-			std::cout << std::setw(2) << std::setfill('0') << (int) this->memory[(this->d<<4) + this->e]; break;
+			std::cout << "A = memory[DE]"; break;
 		case 0x1b: //DCX D
 			std::cout << "DE--"; break;
 		case 0x1c: //INR E
@@ -1622,7 +1619,7 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 			std::cout << "H--"; break;
 		case 0x26: //MVI H
 			std::cout << std::setw(2) << std::setfill('0') << std::hex << (int) memory[index+1];
-			std::cout << " moved into D";
+			std::cout << " moved into H";
 			opBytes = 2; break;
 		case 0x27: //DAA
 			std::cout << "Decimal Adjust Accumulator (check manual for details)"; break;

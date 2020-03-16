@@ -86,7 +86,7 @@ MachineState::MachineState(const std::string& fileName) {
 
 	//establish initial values
 	this->pc = 0;
-	this->sp = 0;
+	this->sp = 0xf000;
 	this->a = 0;
 	this->b = 0;
 	this->c = 0;
@@ -896,7 +896,7 @@ void MachineState::call(bool condition) {
 
 void MachineState::ret(bool condition) {
 	if(condition) {
-		this->pc = (this->memory[this->sp] | (this->memory[this->sp+1] << 8)) - 1;
+		this->pc = (this->memory[this->sp] | (this->memory[this->sp+1] << 8));
 		this->sp += 2;
 	}
 	else
@@ -1708,7 +1708,7 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 			std::cout << "Call if zero bit = 1";
 			opBytes = 3; break;
 		case 0xcd: //CALL
-			std::cout << "Unconditional Call";
+			std::cout << "Unconditional Call, also special output for diagnostic";
 			opBytes = 3; break;
 		case 0xcf: //RST 1
 			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 8"; break;
@@ -1805,8 +1805,6 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 			opBytes = 2; break;
 		case 0xff: //RST 7
 			std::cout << "memory[SP-1] = (PC highest 8 bits), memory[SP-2] = (PC lowest 8 bits), SP -= 2, PC = 56"; break;
-		default:
-			return 1;
 	}
 
 	std::cout << "\n";

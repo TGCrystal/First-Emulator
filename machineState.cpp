@@ -162,6 +162,7 @@ void MachineState::processCommand() {
 			this->a = this->memory[(this->b<<8) | (this->c)]; break;
 		case 0x0b: //DCX    B
 			temp16 = (this->b<<8) | this->c;
+			temp16--;
 			this->b = temp16>>8;
 			this->c = temp16&0xff; break;
 		case 0x0c: //INR    C
@@ -222,6 +223,7 @@ void MachineState::processCommand() {
 			this->a = this->memory[(this->d<<8) | (this->e)]; break;
 		case 0x1b: //DCX    D
 			temp16 = (this->d<<8) | this->e;
+			temp16--;
 			this->d = temp16>>8;
 			this->e = temp16&0xff; break;
 		case 0x1c: //INR    E
@@ -275,15 +277,15 @@ void MachineState::processCommand() {
 			this->h = this->memory[this->pc+1];
 			this->pc++; break;
 		case 0x27: //DAA
-			if(this->cc[4] || ((this->a & 0xf) > 9)) {
-				temp8 = (this->a & 0xf) + 1;
-				this->cc[4] = (temp8 > 0xf);
+			if(this->cc[4] || ((this->a & 0x0f) > 9)) {
+				temp8 = (this->a & 0x0f) + 6;
+				this->cc[4] = (temp8 > 0x0f);
 				this->a += 6;
 			}
-			if((this->a>>4) > 9) {
-				temp8 = (this->a>>4) + 1;
-				this->cc[3] = (temp8 > 0xf);
-				this->a = (this->a&0xf) | (temp8<<4);
+			if(this->cc[3] || (this->a>>4) > 9) {
+				temp8 = (this->a>>4) + 6;
+				this->cc[3] = (temp8 > 0x0f);
+				this->a = (this->a&0x0f) | (temp8<<4);
 			}
 			this->cc[0] = ((this->a & 0xff) == 0);
 			this->cc[1] = ((this->a & 0x80) != 0);
@@ -295,9 +297,11 @@ void MachineState::processCommand() {
 		case 0x2a: //LHLD
 			temp16 = (this->memory[this->pc+2]<<8) | this->memory[this->pc+1];
 			this->l = this->memory[temp16];
-			this->h = this->memory[temp16+1]; break;
+			this->h = this->memory[temp16+1];
+			this->pc += 2; break;
 		case 0x2b: //DCX    H
 			temp16 = (this->h<<8) | this->l;
+			temp16--;
 			this->h = temp16>>8;
 			this->l = temp16&0xff; break;
 		case 0x2c:  //INR    L
@@ -908,8 +912,6 @@ void MachineState::ret(bool condition) {
 		this->pc = (this->memory[this->sp] | (this->memory[this->sp+1] << 8)) - 1;
 		this->sp += 2;
 	}
-	else
-		this->pc += 2;
 }
 
 void MachineState::ana(uint8_t num) {
@@ -941,7 +943,8 @@ void MachineState::ora(uint8_t num) {
 
 void MachineState::cmp(uint8_t num) {
 	uint8_t tmp = ~num;
-	uint16_t answer = (uint16_t) this->a + (uint16_t) tmp + 1;
+	tmp++;
+	uint16_t answer = (uint16_t) this->a + (uint16_t) tmp;
 	this->cc[0] = ((answer & 0xff) == 0);
 	this->cc[1] = ((answer & 0x80) != 0);
 	this->cc[2] = Parity(answer & 0xff);

@@ -61,32 +61,26 @@ MachineState::MachineState(const std::string& fileName) {
 		for(unsigned int i = 0; i < memorySize; i++) {
 			memory[i] = asciiConverter[i];
 		}
+		this->pc = 0;
 	}
 	else {
 		input.open(fileName, std::ios::in | std::ios::binary | std::ios::ate);
 		memorySize = input.tellg();
     	input.seekg (0, std::ios::beg);
 		char* memorySigned = new char[memorySize];
-		memory = new unsigned char[memorySize];
+		memory = new unsigned char[memorySize+256]; //For files where real code starts at 100
     	input.read (memorySigned, memorySize);
-    	for(unsigned int i = 0; i < memorySize; i++) {
-    		memory[i] = (unsigned char) memorySigned[i];
-    	}
-
-    	if(fileName == "cpudiag.bin") {
-    		this->memory[0]= 0xc3;
-    		this->memory[1]= 0;
-    		this->memory[2]= 0x01;
-    		this->memory[368] = 0x7;
-    	}
+    	for(unsigned int i = 0; i < 256; i++) memory[i] = 0;
+    	for(unsigned int i = 0; i < memorySize; i++)
+    		memory[i+256] = (unsigned char) memorySigned[i];
 
     	delete[] memorySigned;
+    	this->pc = 0x100;
 	}
 	input.close();
 
 	//establish initial values
-	this->pc = 0;
-	this->sp = 0xf000;
+	this->sp = 0x3ff;
 	this->a = 0;
 	this->b = 0;
 	this->c = 0;
@@ -158,7 +152,7 @@ void MachineState::processCommand() {
 			this->b = this->memory[this->pc+1];
 			this->pc++; break;
 		case 0x07: //RLC
-			this->cc[3] = this->a & 0x80;
+			this->cc[3] = (this->a & 0x80) >> 7;
 			this->a = (this->a<<1) | this->cc[3]; break;
 		case 0x08: //NOP
 			break;
@@ -187,7 +181,7 @@ void MachineState::processCommand() {
 			this->pc++; break;
 		case 0x0f: //RRC
 			this->cc[3] = this->a & 0x01;
-			this->a = (this->a<<1) | (this->cc[3]<<7); break;
+			this->a = (this->a>>1) | (this->cc[3]<<7); break;
 		case 0x10: //NOP
 			break;
 		case 0x11: //LXI    D,word
@@ -218,7 +212,7 @@ void MachineState::processCommand() {
 			this->pc++; break;
 		case 0x17: //RAL
 			temp8 = this->cc[3];
-			this->cc[3] = this->a & 0x80;
+			this->cc[3] = (this->a & 0x80) >> 7;
 			this->a = (this->a<<1) | temp8; break;
 		case 0x18: //NOP
 			break;
@@ -248,7 +242,7 @@ void MachineState::processCommand() {
 		case 0x1f: //RAR
 			temp8 = this->cc[3];
 			this->cc[3] = this->a & 0x01;
-			this->a = (this->a<<1) | (temp8<<7); break;
+			this->a = (this->a>>1) | (temp8<<7); break;
 		case 0x20: //NOP
 			break;
 		case 0x21: //LXI    H,word
@@ -812,12 +806,12 @@ void MachineState::processCommand() {
 		case 0xf0: //RP
 			ret(!this->cc[1]); break;
 		case 0xf1: //POP    PSW
-			this->a = this->memory[this->sp+1];  
-            this->cc[0]  = (0x01 == (this->memory[this->sp] & 0x01));    
-            this->cc[1]  = (0x02 == (this->memory[this->sp] & 0x02));    
-            this->cc[2]  = (0x04 == (this->memory[this->sp] & 0x04));    
-            this->cc[3] = (0x05 == (this->memory[this->sp] & 0x08));    
-            this->cc[4] = (0x10 == (this->memory[this->sp] & 0x10));    
+			this->a = this->memory[this->sp+1];
+            this->cc[3]  = (01 == (this->memory[this->sp] & 01));
+            this->cc[2]  = (04 == (this->memory[this->sp] & 04));
+            this->cc[4]  = (16 == (this->memory[this->sp] & 16));
+            this->cc[0] = (64 == (this->memory[this->sp] & 64));
+            this->cc[1] = (128 == (this->memory[this->sp] & 128));
             this->sp += 2;  break;
 		case 0xf2: //JP
 			if(!this->cc[1])
@@ -831,11 +825,11 @@ void MachineState::processCommand() {
 			call(!this->cc[1]); break;
 		case 0xf5: //PUSH   PSW
 			this->memory[this->sp-1] = this->a;
-            this->memory[this->sp-2] = (this->cc[0] |
-                            this->cc[1] << 1 |
+            this->memory[this->sp-2] = (this->cc[3] | 2 |
                             this->cc[2] << 2 |
-                            this->cc[3] << 3 |
-                            this->cc[4] << 4 );
+                            this->cc[4] << 4 |
+                            this->cc[0] << 6 |
+                            this->cc[1] << 7 );
             this->sp -= 2; break;
 		case 0xf6: //ORI
 			this->a = this->a | this->memory[this->pc+1];
@@ -883,7 +877,7 @@ void MachineState::add(uint8_t num, uint16_t carry) {
 
 void MachineState::call(bool condition) {
 	if(condition) {
-		uint16_t ret = this->pc + 2;
+		uint16_t ret = (uint16_t) this->pc + 3;
 		this->memory[this->sp-1] = (ret >> 8) & 0xff;
 		this->memory[this->sp-2] = (ret & 0xff);
 		this->sp -= 2;
@@ -895,7 +889,7 @@ void MachineState::call(bool condition) {
 
 void MachineState::ret(bool condition) {
 	if(condition) {
-		this->pc = (this->memory[this->sp] | (this->memory[this->sp+1] << 8));
+		this->pc = (this->memory[this->sp] | (this->memory[this->sp+1] << 8)) - 1;
 		this->sp += 2;
 	}
 	else
@@ -1661,7 +1655,7 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 		case 0x39: //DAD SP
 			std::cout << "HL += SP"; break;
 		case 0x3a: //LDA
-			std::cout << "A = memory[HL]";
+			std::cout << "A = memory[(byte3)(byte2)]";
 			opBytes = 3; break;
 		case 0x3b: //DCX
 			std::cout << "SP--"; break;

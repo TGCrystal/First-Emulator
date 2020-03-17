@@ -33,6 +33,7 @@ private:
 	std::bitset<5> cc;
 
 	//Helper commands for certian opcodes
+	void sub(uint8_t num, uint8_t carry);
 	void add(uint8_t num, uint16_t carry);
 	void call(bool condition);
 	void ret(bool condition);

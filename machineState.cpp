@@ -531,37 +531,37 @@ void MachineState::processCommand() {
 		case 0x8f: //ADC    A
 			add(this->a, this->cc[3]); break;
 		case 0x90: //SUB    B
-			add(~this->b + 1, this->cc[3]); break;
+			sub(this->b, 0); break;
 		case 0x91: //SUB    C
-			add(~this->c + 1, this->cc[3]); break;
+			sub(this->c, 0); break;
 		case 0x92: //SUB    D
-			add(~this->d + 1, this->cc[3]); break;
+			sub(this->d, 0); break;
 		case 0x93: //SUB    E
-			add(~this->e + 1, this->cc[3]); break;
+			sub(this->e, 0); break;
 		case 0x94: //SUB    H
-			add(~this->h + 1, this->cc[3]); break;
+			sub(this->h, 0); break;
 		case 0x95: //SUB    L
-			add(~this->l + 1, this->cc[3]); break;
+			sub(this->l, 0); break;
 		case 0x96: //SUB    M
-			add(~this->memory[(this->h<<8) | (this->l)] + 1, this->cc[3]); break;
+			sub(this->memory[(this->h<<8) | (this->l)], 0); break;
 		case 0x97: //SUB    A
-			add(~this->a + 1, this->cc[3]); break;
+			sub(this->a, 0); break;
 		case 0x98: //SBB    B
-			add(~(1+this->b) + 1, this->cc[3]); break;
+			sub(this->b, this->cc[3]); break;
 		case 0x99: //SBB    C
-			add(~(1+this->c) + 1, this->cc[3]); break;
+			sub(this->c, this->cc[3]); break;
 		case 0x9a: //SBB    D
-			add(~(1+this->d) + 1, this->cc[3]); break;
+			sub(this->d, this->cc[3]); break;
 		case 0x9b: //SBB    E
-			add(~(1+this->e) + 1, this->cc[3]); break;
+			sub(this->e, this->cc[3]); break;
 		case 0x9c: //SBB    H
-			add(~(1+this->h) + 1, this->cc[3]); break;
+			sub(this->h, this->cc[3]); break;
 		case 0x9d: //SBB    L
-			add(~(1+this->l) + 1, this->cc[3]); break;
+			sub(this->l, this->cc[3]); break;
 		case 0x9e: //SBB    M
-			add(~(1+this->memory[(this->h<<8) | (this->l)]) + 1, this->cc[3]); break;
+			sub(this->memory[(this->h<<8) | (this->l)], this->cc[3]); break;
 		case 0x9f: //SBB    A
-			add(~(1+this->a) + 1, this->cc[3]); break;
+			sub(this->a, this->cc[3]); break;
 		case 0xa0: //ANA    B
 			ana(this->b); break;
 		case 0xa1: //ANA    C
@@ -690,7 +690,8 @@ void MachineState::processCommand() {
 				call(true);
 			break;
 		case 0xce: //ACI
-			add(this->memory[this->pc+1], this->cc[3]); break;
+			add(this->memory[this->pc+1], this->cc[3]);
+			this->pc++; break;
 		case 0xcf: //RST    1
 			rst(1); break;
 		case 0xd0: //RNC
@@ -714,7 +715,7 @@ void MachineState::processCommand() {
             this->memory[this->sp-2] = this->e;    
             this->sp -= 2; break;
 		case 0xd6: //SUI
-			add(~this->memory[this->pc+1] + 1, 0);
+			sub(this->memory[this->pc+1], 0);
 			this->pc++; break;
 		case 0xd7: //RST    2
 			rst(2); break;
@@ -736,7 +737,8 @@ void MachineState::processCommand() {
 		case 0xdd: //NOP
 			break;
 		case 0xde: //SBI
-			add(~(this->memory[this->pc+1]+1) + 1, 0); break;
+			sub(this->memory[this->pc+1], this->cc[3]);
+			this->pc++; break;
 		case 0xdf: //RST    3
 			rst(3); break;
 		case 0xe0: //RPO
@@ -863,6 +865,20 @@ void MachineState::processCommand() {
 			rst(7); break;
 	}
 	this->pc++;
+}
+
+void MachineState::sub(uint8_t num, uint8_t carry) {
+	num = ~num;
+	carry = ~carry;
+	num++;
+	carry++;
+	uint16_t answer = (uint16_t) this->a + (uint16_t) num + (uint16_t) carry;
+	this->cc[0] = ((answer & 0xff) == 0);
+	this->cc[1] = ((answer & 0x80) != 0);
+	this->cc[2] = Parity(answer & 0xff);
+	this->cc[3] = !(answer > 0xff);
+	this->cc[4] = ((this->a & 0x0f) + (num & 0x0f) + carry) > 0x0f;
+	this->a = answer & 0xff;
 }
 
 void MachineState::add(uint8_t num, uint16_t carry) {

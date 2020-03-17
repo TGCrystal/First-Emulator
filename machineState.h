@@ -35,8 +35,8 @@ private:
 	//Helper commands for certian opcodes
 	void sub(uint8_t num, uint8_t carry);
 	void add(uint8_t num, uint16_t carry);
-	void call(bool condition);
-	void ret(bool condition);
+	void call();
+	void ret();
 	void ana(uint8_t num);
 	void xra(uint8_t num);
 	void ora(uint8_t num);

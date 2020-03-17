@@ -627,8 +627,7 @@ void MachineState::processCommand() {
 		case 0xbf: //CMP    A
 			cmp(this->a); break;
 		case 0xc0: //RNZ
-			if(!this->cc[0]) ret();
-			break;
+			ret(!this->cc[0]); break;
 		case 0xc1: //POP    B
 			this->b = this->memory[this->sp+1];
 			this->c = this->memory[this->sp];
@@ -642,8 +641,7 @@ void MachineState::processCommand() {
 		case 0xc3: //JMP
 			this->pc = ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]) - 1; break;
 		case 0xc4: //CNZ
-			if(!this->cc[0]) call();
-			break;
+			call(!this->cc[0]); break;
 		case 0xc5: //PUSH   B
 			this->memory[this->sp-1] = this->b;    
             this->memory[this->sp-2] = this->c;    
@@ -654,11 +652,9 @@ void MachineState::processCommand() {
 		case 0xc7: //RST    0
 			rst(0); break;
 		case 0xc8: //RZ
-			if(this->cc[0]) ret();
-			break;
+			ret(this->cc[0]); break;
 		case 0xc9: //RET
-			ret();
-			break;
+			ret(true); break;
 		case 0xca: //JZ
 			if(this->cc[0])
 				this->pc = ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]) - 1;
@@ -668,8 +664,7 @@ void MachineState::processCommand() {
 		case 0xcb: //NOP
 			break;
 		case 0xcc: //CZ
-			if(this->cc[0]) call();
-			break;
+			call(this->cc[0]); break;
 		case 0xcd: //CALL
 			if (5 ==  ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]))    
             {    
@@ -692,7 +687,7 @@ void MachineState::processCommand() {
                 exit(0);    
             }    
             else    
-				call();
+				call(true);
 			break;
 		case 0xce: //ACI
 			add(this->memory[this->pc+1], this->cc[3]);
@@ -700,8 +695,7 @@ void MachineState::processCommand() {
 		case 0xcf: //RST    1
 			rst(1); break;
 		case 0xd0: //RNC
-			if(!this->cc[3]) ret();
-			break;
+			ret(!this->cc[3]); break;
 		case 0xd1: //POP    D
 			this->d = this->memory[this->sp+1];
 			this->e = this->memory[this->sp];
@@ -715,8 +709,7 @@ void MachineState::processCommand() {
 		case 0xd3: //OUT
 			this->pc++; break;
 		case 0xd4: //CNC
-			if(!this->cc[3]) call();
-			break;
+			call(!this->cc[3]); break;
 		case 0xd5: //PUSH   D
 			this->memory[this->sp-1] = this->d;    
             this->memory[this->sp-2] = this->e;    
@@ -727,8 +720,7 @@ void MachineState::processCommand() {
 		case 0xd7: //RST    2
 			rst(2); break;
 		case 0xd8: //RC
-			if(this->cc[3]) ret();
-			break;
+			ret(this->cc[3]); break;
 		case 0xd9: //NOP
 			break;
 		case 0xda: //JC
@@ -741,8 +733,7 @@ void MachineState::processCommand() {
     	    // this->a = MachineIN(this->memory[this->pc+1]);
     	    this->pc++; break;
 		case 0xdc: //CC
-			if(this->cc[3]) call();
-			break;
+			call(this->cc[3]); break;
 		case 0xdd: //NOP
 			break;
 		case 0xde: //SBI
@@ -751,8 +742,7 @@ void MachineState::processCommand() {
 		case 0xdf: //RST    3
 			rst(3); break;
 		case 0xe0: //RPO
-			if(!this->cc[2]) ret();
-			break;
+			ret(!this->cc[2]); break;
 		case 0xe1: //POP    H
 			this->h = this->memory[this->sp+1];
 			this->l = this->memory[this->sp];
@@ -771,8 +761,7 @@ void MachineState::processCommand() {
 			this->h = this->memory[this->sp+1];
 			this->memory[this->sp+1] = temp8; break;
 		case 0xe4: //CPO
-			if(!this->cc[2]) call();
-			break;
+			call(!this->cc[2]); break;
 		case 0xe5: //PUSH   H
 			this->memory[this->sp-1] = this->h;    
             this->memory[this->sp-2] = this->l;    
@@ -787,8 +776,7 @@ void MachineState::processCommand() {
 		case 0xe7: //RST    4
 			rst(4); break;
 		case 0xe8: //RPE
-			if(this->cc[2]) ret();
-			break;
+			ret(this->cc[2]); break;
 		case 0xe9: //PCHL
 			this->pc = ((this->h<<8) | (this->l)) - 1; break;
 		case 0xea: //JPE
@@ -805,8 +793,7 @@ void MachineState::processCommand() {
 			this->e = this->l;
 			this->l = temp8; break;
 		case 0xec: //CPE
-			if(this->cc[2]) call();
-			break;
+			call(this->cc[2]); break;
 		case 0xed: //NOP
 			break;
 		case 0xee: //XRI
@@ -819,8 +806,7 @@ void MachineState::processCommand() {
 		case 0xef: //RST    5
 			rst(5); break;
 		case 0xf0: //RP
-			if(!this->cc[1]) ret();
-			break;
+			ret(!this->cc[1]); break;
 		case 0xf1: //POP    PSW
 			this->a = this->memory[this->sp+1];
             this->cc[3]  = (01 == (this->memory[this->sp] & 01));
@@ -838,8 +824,7 @@ void MachineState::processCommand() {
 		case 0xf3: //DI
 			this->int_enable = 0; break;
 		case 0xf4: //CP
-			if(!this->cc[1]) call();
-			break;
+			call(!this->cc[1]); break;
 		case 0xf5: //PUSH   PSW
 			this->memory[this->sp-1] = this->a;
             this->memory[this->sp-2] = (this->cc[3] | 2 |
@@ -858,8 +843,7 @@ void MachineState::processCommand() {
 		case 0xf7: //RST    6
 			rst(6); break;
 		case 0xf8: //RM
-			if(this->cc[1]) ret();
-			break;
+			ret(this->cc[1]); break;
 		case 0xf9: //SPHL
 			this->sp = (this->h << 8) | this->l; break;
 		case 0xfa: //JM
@@ -871,8 +855,7 @@ void MachineState::processCommand() {
 		case 0xfb: //EI
 			this->int_enable = 1; break;
 		case 0xfc: //CM
-			if(this->cc[1]) call();
-			break;
+			call(this->cc[1]); break;
 		case 0xfd: //NOP
 			break;
 		case 0xfe: //CPI
@@ -908,17 +891,25 @@ void MachineState::add(uint8_t num, uint16_t carry) {
 	this->a = answer & 0xff;
 }
 
-void MachineState::call() {
-	uint16_t ret = (uint16_t) this->pc + 3;
-	this->memory[this->sp-1] = (ret >> 8) & 0xff;
-	this->memory[this->sp-2] = (ret & 0xff);
-	this->sp -= 2;
-	this->pc = ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]) - 1;
+void MachineState::call(bool condition) {
+	if(condition) {
+		uint16_t ret = (uint16_t) this->pc + 3;
+		this->memory[this->sp-1] = (ret >> 8) & 0xff;
+		this->memory[this->sp-2] = (ret & 0xff);
+		this->sp -= 2;
+		this->pc = ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]) - 1;
+	}
+	else
+		this->pc += 2;
 }
 
-void MachineState::ret() {
-	this->pc = (this->memory[this->sp] | (this->memory[this->sp+1] << 8)) - 1;
-	this->sp += 2;
+void MachineState::ret(bool condition) {
+	if(condition) {
+		this->pc = (this->memory[this->sp] | (this->memory[this->sp+1] << 8)) - 1;
+		this->sp += 2;
+	}
+	else
+		this->pc += 2;
 }
 
 void MachineState::ana(uint8_t num) {

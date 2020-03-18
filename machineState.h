@@ -43,6 +43,8 @@ private:
 	void cmp(uint8_t num);
 	void dad(uint16_t num);
 	void rst(uint8_t num);
+	uint8_t MachineIN();
+	void MachineOUT();
 
 	int getOpcode(uint16_t index) const;
 	int getOpcodeDescription(uint16_t index) const;

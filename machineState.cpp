@@ -670,27 +670,27 @@ void MachineState::processCommand() {
 		case 0xcc: //CZ
 			call(this->cc[0]); break;
 		case 0xcd: //CALL
-			if (5 ==  ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]))    
-            {    
-                if (this->c == 9)    
-                {    
-                    uint16_t offset = (this->d<<8) | (this->e);    
-                    char *str = (char*) &this->memory[offset+3];  //skip the prefix bytes    
-                    while (*str != '$')    
-                        printf("%c", *str++);    
-                    printf("\n");    
-                }    
-                else if (this->c == 2)    
-                {    
-                    //saw this in the inspected code, never saw it called    
-                    printf ("print char routine called\n");    
-                }    
-            }    
-            else if (0 ==  ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]))    
-            {    
-                exit(0);    
-            }    
-            else    
+			// if (5 ==  ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]))    
+   //          {    
+   //              if (this->c == 9)    
+   //              {    
+   //                  uint16_t offset = (this->d<<8) | (this->e);    
+   //                  char *str = (char*) &this->memory[offset+3];  //skip the prefix bytes    
+   //                  while (*str != '$')    
+   //                      printf("%c", *str++);    
+   //                  printf("\n");    
+   //              }    
+   //              else if (this->c == 2)    
+   //              {    
+   //                  //saw this in the inspected code, never saw it called    
+   //                  printf ("print char routine called\n");    
+   //              }    
+   //          }    
+   //          else if (0 ==  ((this->memory[this->pc+2] << 8) | this->memory[this->pc+1]))    
+   //          {    
+   //              exit(0);    
+   //          }    
+   //          else    
 				call(true);
 			break;
 		case 0xce: //ACI
@@ -711,6 +711,7 @@ void MachineState::processCommand() {
 				this->pc += 2;
 			break;
 		case 0xd3: //OUT
+			MachineOUT();
 			this->pc++; break;
 		case 0xd4: //CNC
 			call(!this->cc[3]); break;
@@ -734,7 +735,7 @@ void MachineState::processCommand() {
 				this->pc += 2;
 			break;
 		case 0xdb: //IN
-    	    // this->a = MachineIN(this->memory[this->pc+1]);
+    	    this->a = MachineIN();
     	    this->pc++; break;
 		case 0xdc: //CC
 			call(this->cc[3]); break;
@@ -965,6 +966,23 @@ void MachineState::rst(uint8_t num) {
 	this->memory[this->sp] = (this->pc&0xff);
 	this->sp--;
 	this->memory[this->sp] = (this->pc>>4);
+}
+
+uint8_t MachineState::MachineIN() {
+	uint8_t port = this->memory[this->pc+1];
+	uint16_t temp16;
+	uint8_t answer;
+	switch(port) {
+		case 3:
+			temp16 = (shift1<<8) | shift0;
+			answer = ((temp16 >> (8-shift_offset)) & 0xff);
+			break;
+	}
+	return answer;
+}
+
+void MachineState::MachineOUT() {
+	uint8_t port = this->memory[this->pc+1];
 }
 
 int MachineState::getOpcode(uint16_t index) const {

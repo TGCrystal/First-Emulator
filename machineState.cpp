@@ -1801,7 +1801,7 @@ int MachineState::getOpcodeDescription(uint16_t index) const {
 		case 0xf8: //RM
 			std::cout << "Return if sign bit = 1"; break;
 		case 0xf9: //SPHL
-			std::cout << "SPHL"; break;
+			std::cout << "SP = HL"; break;
 		case 0xfa: //JM
 			std::cout << "Jump if sign bit = 1";
 			opBytes = 3; break;

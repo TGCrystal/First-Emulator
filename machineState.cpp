@@ -73,7 +73,7 @@ MachineState::MachineState(const std::string& fileName) {
     	for(unsigned int i = 0; i < 256; i++) memory[i] = 0;
     	for(unsigned int i = 0; i < memorySize; i++)
     		memory[i+256] = (unsigned char) memorySigned[i];
-
+    	memorySize += 256;
     	delete[] memorySigned;
     	this->pc = 0x100;
 	}

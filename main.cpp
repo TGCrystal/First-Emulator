@@ -31,6 +31,8 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	std::cout << "End of memory reached" << std::endl;
+	
 	return 0;
 
 }

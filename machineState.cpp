@@ -981,8 +981,16 @@ uint8_t MachineState::MachineIN() {
 	return answer;
 }
 
-void MachineState::MachineOUT() {
+void MachineState::MachineOUT() { //Example has uint8_t value parameter from somewhere?
 	uint8_t port = this->memory[this->pc+1];
+	switch(port) {
+		case 2:
+			shift_offset = value & 0x7;
+			break;
+		case 4:
+			shift0 = shift1;
+			shift1 = value;
+	}
 }
 
 int MachineState::getOpcode(uint16_t index) const {
